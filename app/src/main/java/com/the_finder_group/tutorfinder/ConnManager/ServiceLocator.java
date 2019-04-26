@@ -2,9 +2,24 @@ package com.the_finder_group.tutorfinder.ConnManager;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.net.Socket;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 /**
  *
@@ -37,11 +52,48 @@ public class ServiceLocator {
     private static final int port = 7474;
 
 
+    public static SSLSocket getSSLSocket(){
+        SSLSocket client = null;
+
+        try {
+            KeyStore keyStore = KeyStore.getInstance("JKS");
+            keyStore.load(new FileInputStream("src\\main\\certs\\client\\clientClientKeyStore.jks"),
+                    "clientpass".toCharArray());
+
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(keyStore, "tutorfinder".toCharArray());
+
+            KeyStore trustedStore = KeyStore.getInstance("JKS");
+            trustedStore.load(new FileInputStream(
+                    "src\\main\\certs\\client\\clientTrustedCerts.jks"), "tutorfinder".toCharArray());
+
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(trustedStore);
+
+            SSLContext sc = SSLContext.getInstance("TLS");
+            TrustManager[] trustManagers = tmf.getTrustManagers();
+            KeyManager[] keyManagers = kmf.getKeyManagers();
+            sc.init(keyManagers, trustManagers, null);
+
+            SSLSocketFactory ssf = sc.getSocketFactory();
+            client = (SSLSocket) ssf.createSocket(serverIp, port);
+
+            client.startHandshake();
+        } catch (CertificateException e) { e.printStackTrace();
+        } catch (IOException e) { e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) { e.printStackTrace();
+        } catch (UnrecoverableKeyException e) { e.printStackTrace();
+        } catch (KeyStoreException e) { e.printStackTrace();
+        } catch (KeyManagementException e) { e.printStackTrace(); }
+
+        return client;
+    }
+
+
     public static String login(String userName) {
 
         String storedPassword = null;
-
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -49,9 +101,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el login al servidor
             dos.writeInt(LOGIN);
@@ -73,7 +125,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -88,7 +140,7 @@ public class ServiceLocator {
 
         UserDTO user = new UserDTO();
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos =null;
 
@@ -96,9 +148,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem les dades de l'usuari al servidor
             dos.writeInt(USER_DATA);
@@ -124,7 +176,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
             }
@@ -137,7 +189,7 @@ public class ServiceLocator {
 
         boolean ret = false;
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -145,9 +197,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el login al servidor
             dos.writeInt(REGISTER);
@@ -171,7 +223,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -184,7 +236,7 @@ public class ServiceLocator {
     public static boolean editUserPswd (String userName, String password){
         boolean ret = false;
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -192,9 +244,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el login al servidor
             dos.writeInt(EDIT_USER_PASSWORD);
@@ -216,7 +268,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -230,7 +282,7 @@ public class ServiceLocator {
 
         boolean ret = false;
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -238,9 +290,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el login al servidor
             dos.writeInt(EDIT_USER);
@@ -264,7 +316,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -278,7 +330,7 @@ public class ServiceLocator {
 
         ArrayList<UserDTO> listUsers= new ArrayList<UserDTO>();
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -286,9 +338,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el login al servidor
             dos.writeInt(LIST_USERS);
@@ -326,7 +378,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -342,7 +394,7 @@ public class ServiceLocator {
 
         boolean ret = false;
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -350,9 +402,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el enviar el nou usuari al servidor
             dos.writeInt(DELETE_USER);
@@ -375,7 +427,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -390,7 +442,7 @@ public class ServiceLocator {
 
         boolean ret = false;
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -398,9 +450,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el login al servidor
             dos.writeInt(PUBLISH_AD);
@@ -425,7 +477,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -439,7 +491,7 @@ public class ServiceLocator {
 
         List<AdDTO> listProducts = new ArrayList<AdDTO>();
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -447,9 +499,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el login al servidor
             dos.writeInt(LIST_PRODUCTS_ROLE);
@@ -491,7 +543,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -507,7 +559,7 @@ public class ServiceLocator {
 
         List<AdDTO> listProducts = new ArrayList<AdDTO>();
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -515,9 +567,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el login al servidor
             dos.writeInt(LIST_PRODUCTS_USER);
@@ -559,7 +611,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -575,7 +627,7 @@ public class ServiceLocator {
 
         List<AdDTO> listProducts = new ArrayList<AdDTO>();
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -583,9 +635,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el login al servidor
             dos.writeInt(LIST_PRODUCTS_BOOKED_USER);
@@ -627,7 +679,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -643,7 +695,7 @@ public class ServiceLocator {
 
         List<AdDTO> listProducts = new ArrayList<AdDTO>();
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -651,9 +703,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el login al servidor
             dos.writeInt(LIST_PRODUCTS_BOOKED_OTHER);
@@ -695,7 +747,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -711,7 +763,7 @@ public class ServiceLocator {
 
         boolean ret = false;
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -719,9 +771,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el enviar el nou usuari al servidor
             dos.writeInt(DELETE_PRODUCT);
@@ -744,7 +796,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -759,7 +811,7 @@ public class ServiceLocator {
 
         boolean ret = false;
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -767,9 +819,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el login al servidor
             dos.writeInt(EDIT_PRODUCT);
@@ -794,7 +846,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -808,7 +860,7 @@ public class ServiceLocator {
 
         boolean ret = false;
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -816,9 +868,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el login al servidor
             dos.writeInt(BOOKING_PRODUCT);
@@ -841,7 +893,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -855,7 +907,7 @@ public class ServiceLocator {
 
         boolean ret = false;
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -863,9 +915,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el login al servidor
             dos.writeInt(CANCEL_BOOKING_PRODUCT);
@@ -887,7 +939,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -900,7 +952,7 @@ public class ServiceLocator {
     //TODO: documentar getAdTypeById ServiceLocator
     public static Integer getAdTypeByName(String adTypeName){
 
-        Socket s = null;
+        SSLSocket client = null;
         DataInputStream dis = null;
         DataOutputStream dos = null;
 
@@ -910,9 +962,9 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            s = new Socket(serverIp, port);
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+            client = (SSLSocket) getSSLSocket();
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
 
             // Solicitem el nom del tipus pel seu id
             dos.writeInt(GET_AD_TYPE_BY_NAME);
@@ -934,7 +986,7 @@ public class ServiceLocator {
                 // Tanquem connexions
                 if (dis != null) { dis.close();}
                 if (dos != null) { dos.close();}
-                if (s != null) { s.close();}
+                if (client != null) { client.close();}
 
             } catch (Exception e) {
                 e.printStackTrace();
