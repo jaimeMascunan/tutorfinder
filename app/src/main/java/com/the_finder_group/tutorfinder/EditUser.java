@@ -235,7 +235,7 @@ public class EditUser extends AppCompatActivity {
             userName = strings[1];
             email = strings[2];
             user_type = strings[3];
-            boolean edit_success = tfClientImple.editUser(Integer.parseInt(userId), userName, email, user_type);
+            boolean edit_success = tfClientImple.editUser(Integer.parseInt(userId), userName, email, user_type, getApplicationContext());
 
             return edit_success;
         }
@@ -281,7 +281,7 @@ public class EditUser extends AppCompatActivity {
         protected Boolean doInBackground(String... strings) {
             userName = strings[0];
             password = strings[1];
-            boolean edit_success = tfClientImple.editUserPswd(userName, password);
+            boolean edit_success = tfClientImple.editUserPswd(userName, password, getApplicationContext());
 
             return edit_success;
         }

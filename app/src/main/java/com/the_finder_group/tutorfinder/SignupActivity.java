@@ -163,7 +163,7 @@ public class SignupActivity extends AppCompatActivity {
             password = strings[2];
             user_type = strings[3];
 
-            boolean register = tfClientImple.newUser(userName, email, password, user_type);
+            boolean register = tfClientImple.newUser(userName, email, password, user_type, getApplicationContext());
             return register;
         }
 

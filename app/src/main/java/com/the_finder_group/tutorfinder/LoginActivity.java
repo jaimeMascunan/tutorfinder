@@ -143,7 +143,7 @@ public class LoginActivity extends AppCompatActivity {
             password = strings[1];
             UserDTO userDTO = null;
             boolean login = false;
-            String storedPassword = tfClientImple.login(userName);
+            String storedPassword = tfClientImple.login(userName, getApplicationContext());
 
             //Validem que el password introdui i el de la base de dades coincideixin
             try {
@@ -156,7 +156,7 @@ public class LoginActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             if (login){
-                userDTO = tfClientImple.userData(userName);
+                userDTO = tfClientImple.userData(userName, getApplicationContext());
                 Log.d(TAG, userDTO.getUserName().toString());
                 Log.d(TAG, userDTO.getUserPswd().toString());
                 Log.d(TAG, userDTO.getUserMail().toString());

@@ -83,7 +83,7 @@ public class FragmentStudentsProducts extends Fragment {
         @Override
         //Instaniem un objecte de la clase tfClientImpl per realitzar la conexio
         protected List<AdDTO> doInBackground(String... strings) {
-            List<AdDTO> llistatProductesRole = tfClientImple.listProductsRole(USER_CODE_STUDENTS);
+            List<AdDTO> llistatProductesRole = tfClientImple.listProductsRole(USER_CODE_STUDENTS, getActivity().getApplicationContext());
 
             return llistatProductesRole;
         }

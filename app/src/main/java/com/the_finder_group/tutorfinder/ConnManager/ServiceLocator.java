@@ -1,9 +1,14 @@
 package com.the_finder_group.tutorfinder.ConnManager;
 
+import android.content.Context;
+import android.util.Log;
+
+import com.the_finder_group.tutorfinder.R;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -25,7 +30,7 @@ import javax.net.ssl.TrustManagerFactory;
  *
  * @author José Luis Puentes Jiménez <jlpuentes74@gmail.com>
  */
-public class ServiceLocator {
+public class ServiceLocator  {
 
     private static final int LOGIN = 0;
     private static final int USER_DATA = 1;
@@ -52,20 +57,20 @@ public class ServiceLocator {
     private static final int port = 7474;
 
 
-    public static SSLSocket getSSLSocket(){
+    public static SSLSocket getSSLSocket(Context context){
         SSLSocket client = null;
 
         try {
-            KeyStore keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(new FileInputStream("src\\main\\certs\\client\\clientClientKeyStore.jks"),
-                    "clientpass".toCharArray());
+            KeyStore keyStore = KeyStore.getInstance("BKS");
+            final InputStream incerts = context.getResources().openRawResource( R.raw.clientkeystore);
+            keyStore.load(incerts, "tutorfinder".toCharArray());
 
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(keyStore, "tutorfinder".toCharArray());
 
-            KeyStore trustedStore = KeyStore.getInstance("JKS");
-            trustedStore.load(new FileInputStream(
-                    "src\\main\\certs\\client\\clientTrustedCerts.jks"), "tutorfinder".toCharArray());
+            KeyStore trustedStore = KeyStore.getInstance("BKS");
+            final InputStream intrust = context.getResources().openRawResource( R.raw.clienttrustedcerts);
+            trustedStore.load(intrust, "tutorfinder".toCharArray());
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(trustedStore);
@@ -75,10 +80,10 @@ public class ServiceLocator {
             KeyManager[] keyManagers = kmf.getKeyManagers();
             sc.init(keyManagers, trustManagers, null);
 
-            SSLSocketFactory ssf = sc.getSocketFactory();
+            SSLSocketFactory ssf = (SSLSocketFactory)sc.getSocketFactory();
             client = (SSLSocket) ssf.createSocket(serverIp, port);
-
             client.startHandshake();
+
         } catch (CertificateException e) { e.printStackTrace();
         } catch (IOException e) { e.printStackTrace();
         } catch (NoSuchAlgorithmException e) { e.printStackTrace();
@@ -90,7 +95,7 @@ public class ServiceLocator {
     }
 
 
-    public static String login(String userName) {
+    public static String login(String userName, Context context) {
 
         String storedPassword = null;
         SSLSocket client = null;
@@ -101,7 +106,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -136,7 +141,7 @@ public class ServiceLocator {
         return storedPassword;
     }
 
-    public static UserDTO userData(String userName) {
+    public static UserDTO userData(String userName, Context context) {
 
         UserDTO user = new UserDTO();
 
@@ -148,7 +153,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -185,7 +190,7 @@ public class ServiceLocator {
         return user;
     }
 
-    public static boolean newUser(String userName, String email, String password, String userType ) {
+    public static boolean newUser(String userName, String email, String password, String userType, Context context ) {
 
         boolean ret = false;
 
@@ -197,7 +202,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -233,7 +238,7 @@ public class ServiceLocator {
         return ret;
     }
 
-    public static boolean editUserPswd (String userName, String password){
+    public static boolean editUserPswd (String userName, String password, Context context){
         boolean ret = false;
 
         SSLSocket client = null;
@@ -244,7 +249,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -278,7 +283,7 @@ public class ServiceLocator {
         return ret;
     }
 
-    public static boolean editUser(Integer user_id, String userName, String email, String userRole ) {
+    public static boolean editUser(Integer user_id, String userName, String email, String userRole, Context context ) {
 
         boolean ret = false;
 
@@ -290,7 +295,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -326,7 +331,7 @@ public class ServiceLocator {
         return ret;
     }
 
-    public static ArrayList<UserDTO> listUsers(){
+    public static ArrayList<UserDTO> listUsers(Context context){
 
         ArrayList<UserDTO> listUsers= new ArrayList<UserDTO>();
 
@@ -338,7 +343,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -350,8 +355,7 @@ public class ServiceLocator {
             // Llegim la resposta
             //Revem el nombre d'ususaris que hi haurà de resposta
             int nUsers = dis.readInt();
-
-            while(dis.available()>0) {
+            Log.d("user", String.valueOf(nUsers));
 
                 for (int i = 0; i < nUsers; i++) {
                     //Rebem los dades del servidor i construï un UserDTO
@@ -362,10 +366,9 @@ public class ServiceLocator {
                     user.setUserMail(dis.readUTF());
                     user.setUserPswd(dis.readUTF());
                     user.setUserRol(dis.readUTF());
-
                     listUsers.add(user);
                 }
-            }
+
 
         } catch (Exception e) {
 
@@ -390,7 +393,7 @@ public class ServiceLocator {
 
     }
 
-    public static boolean deleteUser(String userName){
+    public static boolean deleteUser(String userName, Context context){
 
         boolean ret = false;
 
@@ -402,7 +405,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -438,7 +441,8 @@ public class ServiceLocator {
         return ret;
     }
 
-    public static boolean createAd(Integer ad_user_id, String ad_title, String ad_description, Integer ad_type, Integer ad_price) {
+    public static boolean createAd(Integer ad_user_id, String ad_title, String ad_description,
+                                   Integer ad_type, Integer ad_price, Context context) {
 
         boolean ret = false;
 
@@ -450,7 +454,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -487,7 +491,7 @@ public class ServiceLocator {
         return ret;
     }
 
-    public static List<AdDTO> listProductsRole(Integer user_role_id){
+    public static List<AdDTO> listProductsRole(Integer user_role_id, Context context){
 
         List<AdDTO> listProducts = new ArrayList<AdDTO>();
 
@@ -499,7 +503,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -513,24 +517,22 @@ public class ServiceLocator {
             //Revem el nombre d'ususaris que hi haurà de resposta
             int nProducts = dis.readInt();
 
-            while(dis.available()>0) {
+            for (int i = 0; i < nProducts; i++) {
+                //Rebem los dades del servidor i construï un UserDTO
+                //i el fiquem l'ArrayList
+                AdDTO ad = new AdDTO();
+                ad.setAdId(dis.readInt());
+                ad.setAdUserId(dis.readInt());
+                ad.setUserName(dis.readUTF());
+                ad.setAdTittle(dis.readUTF());
+                ad.setAdDescription(dis.readUTF());
+                ad.setAdTypeId(dis.readInt());
+                ad.setTypesName(dis.readUTF());
+                ad.setAdPrice(dis.readInt());
 
-                for (int i = 0; i < nProducts; i++) {
-                    //Rebem los dades del servidor i construï un UserDTO
-                    //i el fiquem l'ArrayList
-                    AdDTO ad = new AdDTO();
-                    ad.setAdId(dis.readInt());
-                    ad.setAdUserId(dis.readInt());
-                    ad.setUserName(dis.readUTF());
-                    ad.setAdTittle(dis.readUTF());
-                    ad.setAdDescription(dis.readUTF());
-                    ad.setAdTypeId(dis.readInt());
-                    ad.setTypesName(dis.readUTF());
-                    ad.setAdPrice(dis.readInt());
-
-                    listProducts.add(ad);
-                }
+                listProducts.add(ad);
             }
+
 
         } catch (Exception e) {
 
@@ -555,7 +557,7 @@ public class ServiceLocator {
 
     }
 
-    public static List<AdDTO> listProductsUser(Integer user_id){
+    public static List<AdDTO> listProductsUser(Integer user_id, Context context){
 
         List<AdDTO> listProducts = new ArrayList<AdDTO>();
 
@@ -567,7 +569,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -581,24 +583,23 @@ public class ServiceLocator {
             //Revem el nombre d'ususaris que hi haurà de resposta
             int nProducts = dis.readInt();
 
-            while(dis.available()>0) {
 
-                for (int i = 0; i < nProducts; i++) {
-                    //Rebem los dades del servidor i construï un UserDTO
-                    //i el fiquem l'ArrayList
-                    AdDTO ad = new AdDTO();
-                    ad.setAdId(dis.readInt());
-                    ad.setAdUserId(dis.readInt());
-                    ad.setUserName(dis.readUTF());
-                    ad.setAdTittle(dis.readUTF());
-                    ad.setAdDescription(dis.readUTF());
-                    ad.setAdTypeId(dis.readInt());
-                    ad.setTypesName(dis.readUTF());
-                    ad.setAdPrice(dis.readInt());
+            for (int i = 0; i < nProducts; i++) {
+                //Rebem los dades del servidor i construï un UserDTO
+                //i el fiquem l'ArrayList
+                AdDTO ad = new AdDTO();
+                ad.setAdId(dis.readInt());
+                ad.setAdUserId(dis.readInt());
+                ad.setUserName(dis.readUTF());
+                ad.setAdTittle(dis.readUTF());
+                ad.setAdDescription(dis.readUTF());
+                ad.setAdTypeId(dis.readInt());
+                ad.setTypesName(dis.readUTF());
+                ad.setAdPrice(dis.readInt());
 
-                    listProducts.add(ad);
-                }
+                listProducts.add(ad);
             }
+
 
         } catch (Exception e) {
 
@@ -623,7 +624,7 @@ public class ServiceLocator {
 
     }
 
-    public static List<AdDTO> listProductsBookedByUser(Integer user_id){
+    public static List<AdDTO> listProductsBookedByUser(Integer user_id, Context context){
 
         List<AdDTO> listProducts = new ArrayList<AdDTO>();
 
@@ -635,7 +636,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -649,24 +650,23 @@ public class ServiceLocator {
             //Revem el nombre d'ususaris que hi haurà de resposta
             int nProducts = dis.readInt();
 
-            while(dis.available()>0) {
 
-                for (int i = 0; i < nProducts; i++) {
-                    //Rebem los dades del servidor i construï un UserDTO
-                    //i el fiquem l'ArrayList
-                    AdDTO product = new AdDTO();
+            for (int i = 0; i < nProducts; i++) {
+                //Rebem los dades del servidor i construï un UserDTO
+                //i el fiquem l'ArrayList
+                AdDTO product = new AdDTO();
 
-                    product.setAdId(dis.readInt());
-                    product.setAdUserId(dis.readInt());
-                    product.setAdTittle(dis.readUTF());
-                    product.setAdDescription(dis.readUTF());
-                    product.setAdTypeId(dis.readInt());
-                    product.setTypesName(dis.readUTF());
-                    product.setAdPrice(dis.readInt());
+                product.setAdId(dis.readInt());
+                product.setAdUserId(dis.readInt());
+                product.setAdTittle(dis.readUTF());
+                product.setAdDescription(dis.readUTF());
+                product.setAdTypeId(dis.readInt());
+                product.setTypesName(dis.readUTF());
+                product.setAdPrice(dis.readInt());
 
-                    listProducts.add(product);
-                }
+                listProducts.add(product);
             }
+
 
         } catch (Exception e) {
 
@@ -691,7 +691,7 @@ public class ServiceLocator {
 
     }
 
-    public static List<AdDTO> listProductsBookedByOther(Integer user_id){
+    public static List<AdDTO> listProductsBookedByOther(Integer user_id, Context context){
 
         List<AdDTO> listProducts = new ArrayList<AdDTO>();
 
@@ -703,7 +703,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -717,23 +717,20 @@ public class ServiceLocator {
             //Revem el nombre d'ususaris que hi haurà de resposta
             int nProducts = dis.readInt();
 
-            while(dis.available()>0) {
+            for (int i = 0; i < nProducts; i++) {
+                //Rebem los dades del servidor i construï un UserDTO
+                //i el fiquem l'ArrayList
+                AdDTO product = new AdDTO();
 
-                for (int i = 0; i < nProducts; i++) {
-                    //Rebem los dades del servidor i construï un UserDTO
-                    //i el fiquem l'ArrayList
-                    AdDTO product = new AdDTO();
+                product.setAdId(dis.readInt());
+                product.setAdUserId(dis.readInt());
+                product.setAdTittle(dis.readUTF());
+                product.setAdDescription(dis.readUTF());
+                product.setAdTypeId(dis.readInt());
+                product.setTypesName(dis.readUTF());
+                product.setAdPrice(dis.readInt());
 
-                    product.setAdId(dis.readInt());
-                    product.setAdUserId(dis.readInt());
-                    product.setAdTittle(dis.readUTF());
-                    product.setAdDescription(dis.readUTF());
-                    product.setAdTypeId(dis.readInt());
-                    product.setTypesName(dis.readUTF());
-                    product.setAdPrice(dis.readInt());
-
-                    listProducts.add(product);
-                }
+                listProducts.add(product);
             }
 
         } catch (Exception e) {
@@ -759,7 +756,7 @@ public class ServiceLocator {
 
     }
 
-    public static boolean delAd(Integer productId){
+    public static boolean delAd(Integer productId, Context context){
 
         boolean ret = false;
 
@@ -771,7 +768,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -807,7 +804,8 @@ public class ServiceLocator {
         return ret;
     }
 
-    public static boolean editAd(Integer ad_id, String ad_title, String ad_description, Integer ad_type_id, Integer ad_price) {
+    public static boolean editAd(Integer ad_id, String ad_title, String ad_description,
+                                 Integer ad_type_id, Integer ad_price, Context context) {
 
         boolean ret = false;
 
@@ -819,7 +817,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -856,7 +854,7 @@ public class ServiceLocator {
         return ret;
     }
 
-    public static boolean adsBookByUser(Integer ad_id, Integer ad_user_booking_id) {
+    public static boolean adsBookByUser(Integer ad_id, Integer ad_user_booking_id, Context context) {
 
         boolean ret = false;
 
@@ -868,7 +866,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -903,7 +901,7 @@ public class ServiceLocator {
         return ret;
     }
 
-    public static boolean cancelBookingProductByUser(Integer ad_id) {
+    public static boolean cancelBookingProductByUser(Integer ad_id, Context context) {
 
         boolean ret = false;
 
@@ -915,7 +913,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 
@@ -950,7 +948,7 @@ public class ServiceLocator {
     }
 
     //TODO: documentar getAdTypeById ServiceLocator
-    public static Integer getAdTypeByName(String adTypeName){
+    public static Integer getAdTypeByName(String adTypeName, Context context){
 
         SSLSocket client = null;
         DataInputStream dis = null;
@@ -962,7 +960,7 @@ public class ServiceLocator {
 
             // Instanciem el Socket i els Input i Output
             // per comunicar amb el server
-            client = (SSLSocket) getSSLSocket();
+            client = (SSLSocket) getSSLSocket(context);
             dis = new DataInputStream(client.getInputStream());
             dos = new DataOutputStream(client.getOutputStream());
 

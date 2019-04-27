@@ -1,5 +1,7 @@
 package com.the_finder_group.tutorfinder.ConnManager;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,107 +14,107 @@ import java.util.List;
 public class TFClientImple implements TFClient{
 
     @Override
-    public String login(String userName) {
+    public String login(String userName, Context context) {
 
-        return ServiceLocator.login(userName);
-
-    }
-
-    @Override
-    public UserDTO userData(String userName) {
-
-        return ServiceLocator.userData(userName);
+        return ServiceLocator.login(userName, context);
 
     }
 
     @Override
-    public boolean newUser(String userName, String email, String pswd, String userType){
+    public UserDTO userData(String userName, Context context) {
 
-        return ServiceLocator.newUser(userName, email, pswd, userType);
+        return ServiceLocator.userData(userName, context);
+
     }
 
     @Override
-    public boolean editUser( Integer user_id, String userName, String email, String userRole){
+    public boolean newUser(String userName, String email, String pswd, String userType, Context context){
 
-        return ServiceLocator.editUser(user_id, userName, email, userRole);
+        return ServiceLocator.newUser(userName, email, pswd, userType, context);
     }
 
     @Override
-    public boolean editUserPswd (String userName, String password){
+    public boolean editUser( Integer user_id, String userName, String email, String userRole, Context context){
 
-        return ServiceLocator.editUserPswd(userName, password);
+        return ServiceLocator.editUser(user_id, userName, email, userRole, context);
     }
 
     @Override
-    public ArrayList<UserDTO> listUsers(){
+    public boolean editUserPswd (String userName, String password, Context context){
 
-        return ServiceLocator.listUsers();
+        return ServiceLocator.editUserPswd(userName, password, context);
     }
 
     @Override
-    public boolean delUser (String userName){
+    public ArrayList<UserDTO> listUsers(Context context){
 
-        return ServiceLocator.deleteUser(userName);
+        return ServiceLocator.listUsers(context);
     }
 
     @Override
-    public boolean createAd(Integer ad_user_id, String ad_title, String ad_description, Integer ad_type, Integer ad_price){
+    public boolean delUser (String userName, Context context){
 
-        return ServiceLocator.createAd(ad_user_id, ad_title, ad_description, ad_type, ad_price);
+        return ServiceLocator.deleteUser(userName, context);
     }
 
     @Override
-    public List<AdDTO> listProductsRole(Integer user_role_id){
+    public boolean createAd(Integer ad_user_id, String ad_title, String ad_description, Integer ad_type, Integer ad_price, Context context){
 
-        return ServiceLocator.listProductsRole(user_role_id);
+        return ServiceLocator.createAd(ad_user_id, ad_title, ad_description, ad_type, ad_price, context);
     }
 
     @Override
-    public List<AdDTO> listProductsUser(Integer user_id){
+    public List<AdDTO> listProductsRole(Integer user_role_id, Context context){
 
-        return ServiceLocator.listProductsUser(user_id);
+        return ServiceLocator.listProductsRole(user_role_id, context);
     }
 
     @Override
-    public boolean delAd (Integer productId){
+    public List<AdDTO> listProductsUser(Integer user_id, Context context){
 
-        return ServiceLocator.delAd(productId);
+        return ServiceLocator.listProductsUser(user_id, context);
     }
 
     @Override
-    public boolean editAd (Integer ad_id, String ad_title, String ad_description, Integer ad_type_id, Integer ad_price){
+    public boolean delAd (Integer productId, Context context){
 
-        return ServiceLocator.editAd(ad_id, ad_title, ad_description, ad_type_id, ad_price);
+        return ServiceLocator.delAd(productId, context);
     }
 
     @Override
-    public boolean bookAd (Integer ad_id, Integer ad_user_booking_id){
+    public boolean editAd (Integer ad_id, String ad_title, String ad_description, Integer ad_type_id, Integer ad_price, Context context){
 
-        return ServiceLocator.adsBookByUser(ad_id, ad_user_booking_id);
+        return ServiceLocator.editAd(ad_id, ad_title, ad_description, ad_type_id, ad_price, context);
     }
 
     @Override
-    public List<AdDTO> listBookAdsUser (Integer user_id){
+    public boolean bookAd (Integer ad_id, Integer ad_user_booking_id, Context context){
 
-        return ServiceLocator.listProductsBookedByUser(user_id);
+        return ServiceLocator.adsBookByUser(ad_id, ad_user_booking_id, context);
     }
 
     @Override
-    public List<AdDTO> listBookdAdsOther (Integer user_id){
+    public List<AdDTO> listBookAdsUser (Integer user_id, Context context){
 
-        return ServiceLocator.listProductsBookedByOther(user_id);
+        return ServiceLocator.listProductsBookedByUser(user_id, context);
     }
 
     @Override
-    public boolean cancelBookAd (Integer ad_id){
+    public List<AdDTO> listBookdAdsOther (Integer user_id, Context context){
 
-        return ServiceLocator.cancelBookingProductByUser(ad_id);
+        return ServiceLocator.listProductsBookedByOther(user_id, context);
     }
 
     @Override
-    public int getAdTypeByName(String adTypeName) {
+    public boolean cancelBookAd (Integer ad_id, Context context){
 
-        return ServiceLocator.getAdTypeByName(adTypeName);
+        return ServiceLocator.cancelBookingProductByUser(ad_id, context);
+    }
+
+    @Override
+    public int getAdTypeByName(String adTypeName, Context context) {
+
+        return ServiceLocator.getAdTypeByName(adTypeName, context);
     }
 
 

@@ -89,7 +89,7 @@ public class LlistarUsers extends AppCompatActivity {
         @Override
         //Instaniem un objecte de la clase tfClientImpl per realitzar la conexio
         protected List<UserDTO> doInBackground(String... strings) {
-            ArrayList<UserDTO> llistatUsuaris = tfClientImple.listUsers();
+            ArrayList<UserDTO> llistatUsuaris = tfClientImple.listUsers(getApplicationContext());
             //Eliminem l'usuari que esta loggegat de la llista per a que no es pugi esborrar a si mateix
             Iterator<UserDTO> users_iterator = llistatUsuaris.iterator();
             while (users_iterator.hasNext()){

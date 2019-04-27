@@ -124,7 +124,7 @@ public class AdActivity extends AppCompatActivity {
             preu = Integer.parseInt(strings[3]);
             adTypeId = Integer.parseInt(strings[4]);
 
-            boolean publish = tfClientImple.createAd(userId, titol, descripcio, adTypeId, preu);
+            boolean publish = tfClientImple.createAd(userId, titol, descripcio, adTypeId, preu, getApplicationContext());
             return publish;
         }
 
@@ -154,7 +154,7 @@ public class AdActivity extends AppCompatActivity {
         @Override
         protected Integer doInBackground(String... strings) {
             categoria = strings[0];
-            Integer adTypeId = tfClientImple.getAdTypeByName(categoria);
+            Integer adTypeId = tfClientImple.getAdTypeByName(categoria, getApplicationContext());
             Log.d(TAG, String.valueOf(adTypeId));
             return adTypeId;
         }

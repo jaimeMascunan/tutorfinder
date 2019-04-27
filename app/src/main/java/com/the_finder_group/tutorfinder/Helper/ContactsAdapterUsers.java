@@ -181,7 +181,7 @@ public class ContactsAdapterUsers extends RecyclerView.Adapter<ContactsAdapterUs
         protected Boolean doInBackground(String... strings) {
             user_name = (strings[0]);
 
-            boolean delete = tfClientImple.delUser(user_name);
+            boolean delete = tfClientImple.delUser(user_name, context);
             return delete;
         }
 

@@ -121,7 +121,7 @@ public class LlistarAdsUser extends AppCompatActivity {
         @Override
         //Instaniem un objecte de la clase tfClientImpl per realitzar la conexio
         protected List<AdDTO> doInBackground(String... strings) {
-            List<AdDTO> llistatProductesRole = tfClientImple.listProductsRole(userRoleIdList);
+            List<AdDTO> llistatProductesRole = tfClientImple.listProductsRole(userRoleIdList, getApplicationContext());
 
             return llistatProductesRole;
         }
@@ -144,7 +144,7 @@ public class LlistarAdsUser extends AppCompatActivity {
         @Override
         //Instaniem un objecte de la clase tfClientImpl per realitzar la conexio
         protected List<AdDTO> doInBackground(String... strings) {
-            List<AdDTO> llistatProductesUser = tfClientImple.listProductsUser(userId);
+            List<AdDTO> llistatProductesUser = tfClientImple.listProductsUser(userId, getApplicationContext());
 
             return llistatProductesUser;
         }

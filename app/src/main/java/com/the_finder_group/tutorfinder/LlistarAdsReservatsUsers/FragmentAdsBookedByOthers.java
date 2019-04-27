@@ -86,7 +86,7 @@ public class FragmentAdsBookedByOthers extends Fragment {
         @Override
         //Instaniem un objecte de la clase tfClientImpl per realitzar la conexio
         protected List<AdDTO> doInBackground(String... strings) {
-            List<AdDTO> listAds = tfClientImple.listBookdAdsOther(queryUserId);
+            List<AdDTO> listAds = tfClientImple.listBookdAdsOther(queryUserId, getActivity());
 
             return listAds;
         }

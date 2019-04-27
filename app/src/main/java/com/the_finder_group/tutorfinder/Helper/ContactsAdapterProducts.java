@@ -346,7 +346,7 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
         protected Boolean doInBackground(String... strings) {
             product_id = Integer.parseInt(strings[0]);
 
-            boolean delete = tfClientImple.delAd(product_id);
+            boolean delete = tfClientImple.delAd(product_id, context);
             return delete;
         }
 
@@ -389,7 +389,7 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
             ad_type = strings[6];
 
 
-            boolean edit = tfClientImple.editAd(product_id, titol, descripcio, ad_type_id, preu);
+            boolean edit = tfClientImple.editAd(product_id, titol, descripcio, ad_type_id, preu, context);
             return edit;
         }
 
@@ -433,7 +433,7 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
             ad_user_booking_id = integers[1];
 
 
-            boolean registrat = tfClientImple.bookAd(product_id, ad_user_booking_id);
+            boolean registrat = tfClientImple.bookAd(product_id, ad_user_booking_id, context);
             return registrat;
         }
 
@@ -469,7 +469,7 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
         protected Boolean doInBackground(Integer...integers) {
             product_id = integers[0];
 
-            boolean registrat = tfClientImple.cancelBookAd(product_id);
+            boolean registrat = tfClientImple.cancelBookAd(product_id, context);
             return registrat;
         }
 
@@ -511,7 +511,7 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
             preu = strings[4];
             position = strings[5];
 
-            adTypeId = tfClientImple.getAdTypeByName(categoria);
+            adTypeId = tfClientImple.getAdTypeByName(categoria, context);
             return adTypeId;
         }
 
