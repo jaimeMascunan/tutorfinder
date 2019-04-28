@@ -49,6 +49,9 @@ public class ServiceLocator  {
     private static final int LIST_PRODUCTS_BOOKED_OTHER = 18;
     private static final int CANCEL_BOOKING_PRODUCT = 9;
     private static final int GET_AD_TYPE_BY_NAME = 17;
+    private static final int LIST_PRODUCTS_BY_ADMIN = 19;
+    private static final int CREATE_MESSAGE = 20;
+    private static final int LIST_MESSAGES_BY_USER = 21;
 
     private static final String LOGIN_CODE = "loginString";
 
@@ -557,6 +560,72 @@ public class ServiceLocator  {
 
     }
 
+    public static List<AdDTO> listProductsAdmin(Integer user_role_id, Context context){
+
+        List<AdDTO> listProducts = new ArrayList<AdDTO>();
+
+        SSLSocket client = null;
+        DataInputStream dis = null;
+        DataOutputStream dos = null;
+
+        try {
+
+            // Instanciem el Socket i els Input i Output
+            // per comunicar amb el server
+            client = (SSLSocket) getSSLSocket(context);
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
+
+            // Solicitem el login al servidor
+            dos.writeInt(LIST_PRODUCTS_BY_ADMIN);
+            //Enviem el tipus d'usuari que volem llistar
+            dos.writeInt(user_role_id);
+            dos.flush();
+
+            // Llegim la resposta
+            //Revem el nombre d'ususaris que hi haurà de resposta
+            int nProducts = dis.readInt();
+
+            for (int i = 0; i < nProducts; i++) {
+                //Rebem los dades del servidor i construï un UserDTO
+                //i el fiquem l'ArrayList
+                AdDTO ad = new AdDTO();
+                ad.setAdId(dis.readInt());
+                ad.setAdUserId(dis.readInt());
+                ad.setUserName(dis.readUTF());
+                ad.setAdTittle(dis.readUTF());
+                ad.setAdDescription(dis.readUTF());
+                ad.setAdTypeId(dis.readInt());
+                ad.setTypesName(dis.readUTF());
+                ad.setAdPrice(dis.readInt());
+
+                listProducts.add(ad);
+            }
+
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+
+            try {
+                // Tanquem connexions
+                if (dis != null) { dis.close();}
+                if (dos != null) { dos.close();}
+                if (client != null) { client.close();}
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+
+        return listProducts;
+
+    }
+
     public static List<AdDTO> listProductsUser(Integer user_id, Context context){
 
         List<AdDTO> listProducts = new ArrayList<AdDTO>();
@@ -995,4 +1064,112 @@ public class ServiceLocator  {
         return ret;
     }
 
+    public static boolean createMessage(Integer sender_id, String sender_name, String message,
+                                        String date, Context context) {
+
+        boolean ret = false;
+
+        SSLSocket client = null;
+        DataInputStream dis = null;
+        DataOutputStream dos = null;
+
+        try {
+
+            // Instanciem el Socket i els Input i Output
+            // per comunicar amb el server
+            client = (SSLSocket) getSSLSocket(context);
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
+
+            // Solicitem el login al servidor
+            dos.writeInt(CREATE_MESSAGE);
+            dos.writeInt(sender_id);
+            dos.writeUTF(sender_name);
+            dos.writeUTF(message);
+            dos.writeUTF(date);
+            dos.flush();
+
+            // Llegim la resposta
+            ret = dis.readBoolean();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+
+            try {
+                // Tanquem connexions
+                if (dis != null) { dis.close();}
+                if (dos != null) { dos.close();}
+                if (client != null) { client.close();}
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        return ret;
+    }
+
+    public static List<UserMessageDTO> listtMessagesByYser(Integer user_id, Context context){
+
+        List<UserMessageDTO> messages = new ArrayList<UserMessageDTO>();
+
+        SSLSocket client = null;
+        DataInputStream dis = null;
+        DataOutputStream dos = null;
+
+        try {
+
+            // Instanciem el Socket i els Input i Output
+            // per comunicar amb el server
+            client = (SSLSocket) getSSLSocket(context);
+            dis = new DataInputStream(client.getInputStream());
+            dos = new DataOutputStream(client.getOutputStream());
+
+            // Solicitem el login al servidor
+            dos.writeInt(LIST_MESSAGES_BY_USER);
+            //Enviem el tipus d'usuari que volem llistar
+            dos.writeInt(user_id);
+            dos.flush();
+
+            // Llegim la resposta
+            //Revem el nombre d'ususaris que hi haurà de resposta
+            int nMessages = dis.readInt();
+
+            for (int i = 0; i < nMessages; i++) {
+                //Rebem los dades del servidor i construï un UserDTO
+                //i el fiquem l'ArrayList
+                UserMessageDTO message = new UserMessageDTO();
+                message.setMessageId(dis.readInt());
+                message.setMessageUserId(dis.readInt());
+                message.setMessageUserName(dis.readUTF());
+                message.setMessageText(dis.readUTF());
+                message.setMessageDate(dis.readUTF());
+                messages.add(message);
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            throw new RuntimeException(e);
+
+        } finally {
+
+            try {
+                // Tanquem connexions
+                if (dis != null) { dis.close();}
+                if (dos != null) { dos.close();}
+                if (client != null) { client.close();}
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+
+        return messages;
+    }
 }

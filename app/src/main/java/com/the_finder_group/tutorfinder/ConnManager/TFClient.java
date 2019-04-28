@@ -79,6 +79,12 @@ public interface TFClient {
     public List<AdDTO> listProductsRole(Integer user_role_id, Context context);
 
     /**
+     * @param user_role_id el tipus de usuaris que volem llistar
+     * @return
+     */
+    public List<AdDTO> listProductsAdmin(Integer user_role_id, Context context);
+
+    /**
      * @param user_id el tipus de usuaris que volem llistar
      * @return
      */
@@ -132,5 +138,22 @@ public interface TFClient {
 
     //TODO: documentar getAdTypeByName
     public int getAdTypeByName(String adTypeName, Context context);
+
+    /**
+     *
+     * @param sender_id
+     * @param sender_name
+     * @param message
+     * @param date
+     * @return
+     */
+    public boolean createMessage (Integer sender_id, String sender_name, String message, String date, Context context);
+
+    /**
+     *
+     * @param user_id
+     * @return
+     */
+    public List<UserMessageDTO> listMessagesByUser (Integer user_id, Context context);
 
 }

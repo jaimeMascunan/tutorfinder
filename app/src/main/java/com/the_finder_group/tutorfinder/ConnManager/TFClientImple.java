@@ -2,6 +2,7 @@ package com.the_finder_group.tutorfinder.ConnManager;
 
 import android.content.Context;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,6 +71,12 @@ public class TFClientImple implements TFClient{
     }
 
     @Override
+    public List<AdDTO> listProductsAdmin(Integer user_role_id, Context context){
+
+        return ServiceLocator.listProductsAdmin(user_role_id, context);
+    }
+
+    @Override
     public List<AdDTO> listProductsUser(Integer user_id, Context context){
 
         return ServiceLocator.listProductsUser(user_id, context);
@@ -117,7 +124,15 @@ public class TFClientImple implements TFClient{
         return ServiceLocator.getAdTypeByName(adTypeName, context);
     }
 
+    @Override
+    public boolean createMessage(Integer sender_id, String sender_name, String message, String date, Context context) {
+        return ServiceLocator.createMessage(sender_id, sender_name, message, date, context);
+    }
 
+    @Override
+    public List<UserMessageDTO> listMessagesByUser(Integer user_id, Context context) {
+        return ServiceLocator.listtMessagesByYser(user_id, context);
+    }
 }
 
 

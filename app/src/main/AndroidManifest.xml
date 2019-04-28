@@ -16,8 +16,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".LlistarAdsAdmin.TabActivityAdmin"></activity>
-        <activity android:name=".LlistarAdsReservatsUsers.TabActivityUsers"></activity>
+        <activity android:name=".MessageListActivity"></activity>
+        <activity android:name=".LlistarAdsAdmin.TabActivityAdmin" />
+        <activity android:name=".LlistarAdsReservatsUsers.TabActivityUsers" />
         <activity android:name=".LlistarAdsUser" />
         <activity
             android:name=".EditUser"

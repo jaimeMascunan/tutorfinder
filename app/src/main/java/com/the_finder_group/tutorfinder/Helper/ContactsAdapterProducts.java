@@ -1,8 +1,10 @@
 package com.the_finder_group.tutorfinder.Helper;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.PopupMenu;
@@ -20,6 +22,7 @@ import android.widget.TextView;
 
 import com.the_finder_group.tutorfinder.ConnManager.AdDTO;
 import com.the_finder_group.tutorfinder.ConnManager.TFClientImple;
+import com.the_finder_group.tutorfinder.MessageListActivity;
 import com.the_finder_group.tutorfinder.R;
 
 import java.util.ArrayList;
@@ -295,7 +298,9 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
                         break;
 
                     case R.id.menu_info_owner_product:
-                        //Per codificar encara
+                        Intent intent = new Intent(context, MessageListActivity.class);
+                        context.startActivity(intent);
+                        ((Activity)context).finish();
                         break;
                 }
                 return false;
@@ -322,7 +327,9 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
                         break;
 
                     case R.id.menu_contact_owner_product:
-                        //Per codificar encara
+                        Intent intent = new Intent(context, MessageListActivity.class);
+                        context.startActivity(intent);
+                        ((Activity)context).finish();
                         break;
                 }
                 return false;
