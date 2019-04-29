@@ -1,19 +1,21 @@
 package com.the_finder_group.tutorfinder;
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.the_finder_group.tutorfinder.ConnManager.TFClientImple;
 import com.the_finder_group.tutorfinder.ConnManager.UserMessageDTO;
+import com.the_finder_group.tutorfinder.Helper.Helper;
 import com.the_finder_group.tutorfinder.Helper.MessageListAdapter;
 import com.the_finder_group.tutorfinder.Helper.SQLiteHandler;
 
@@ -32,25 +34,33 @@ public class MessageListActivity extends AppCompatActivity {
     private List<UserMessageDTO> messageList;
     private SQLiteHandler db;
     private TFClientImple tfClientImple;
+    private Helper helper;
     private Button send;
-    private ProgressDialog pDialog;
     private Integer  db_user_id;
-    private String db_user_name, message, timestamp;
+    private String db_user_name, db_loggedUserType, message, timestamp;
     private EditText chat_box;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message_list);
+        Toolbar toolbar = findViewById(R.id.toolbar_chat);
+        setSupportActionBar(toolbar);
+
+        // toolbar fancy stuff
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         recyclerView = (RecyclerView) findViewById(R.id.reyclerview_message_list);
         messageList = new ArrayList<>();
         mMessageAdapter = new MessageListAdapter(this, messageList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         chat_box = (EditText)findViewById(R.id.edittext_chatbox);
 
         //TFClient implementation
         tfClientImple = new TFClientImple();
+
+        helper = new Helper(getApplicationContext());
 
         db = new SQLiteHandler(getApplicationContext());
         // Fetching user details from sqlite
@@ -58,26 +68,24 @@ public class MessageListActivity extends AppCompatActivity {
         //Id de l'usuari que esta realitzant lel registre
         db_user_id = Integer.parseInt(user.get("user_id"));
         db_user_name = user.get("name");
-
-        // Progress dialog
-        pDialog = new ProgressDialog(this);
-        pDialog.setCancelable(false);
-
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mMessageAdapter);
+        db_loggedUserType = user.get(getResources().getString(R.string.user_type));
 
         send = (Button)findViewById(R.id.button_chatbox_send);
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 message = chat_box.getText().toString();
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy-hh-mm-ss");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM hh:mm");
                 timestamp = simpleDateFormat.format(new Date());
                 sendMessage();
             }
         });
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mMessageAdapter);
+
     }
 
     public void sendMessage(){
@@ -93,10 +101,7 @@ public class MessageListActivity extends AppCompatActivity {
         Integer userId;
 
         @Override
-        protected void onPreExecute(){
-            pDialog.setMessage("Publishing");
-            showDialog();
-        }
+        protected void onPreExecute(){ }
 
         @Override
         protected Boolean doInBackground(String... strings) {
@@ -106,27 +111,42 @@ public class MessageListActivity extends AppCompatActivity {
             time = strings[3];
 
             boolean publish = tfClientImple.createMessage(userId, userName, message, time , getApplicationContext());
+
             return publish;
         }
 
         @Override
         protected void onPostExecute(Boolean result){
             super.onPostExecute(result);
-            hideDialog();
             chat_box.setText("");
+            if (result){
+                UserMessageDTO userMessageDTO = new UserMessageDTO();
+                userMessageDTO.setMessageUserId(userId);
+                userMessageDTO.setMessageUserName(userName);
+                userMessageDTO.setMessageText(message);
+                userMessageDTO.setMessageDate(time);
+                messageList.add(userMessageDTO);
+                Log.d("prueba", userMessageDTO.getMessageText()) ;
+            }
+            // refreshing recycler view
+            mMessageAdapter.notifyDataSetChanged();
         }
     }
 
-    //Mostrem el progres dialog
-    private void showDialog() {
-        if (!pDialog.isShowing())
-            pDialog.show();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        if(id == android.R.id.home) {
+            helper.redirectUserTypeAct(db_loggedUserType);
+        }
+
+        return super.onOptionsItemSelected(item);
     }
-    //Amaguem el progres dialog
-    private void hideDialog() {
-        if (pDialog.isShowing())
-            pDialog.dismiss();
-    }
+
 
     @Override
     public void onBackPressed(){

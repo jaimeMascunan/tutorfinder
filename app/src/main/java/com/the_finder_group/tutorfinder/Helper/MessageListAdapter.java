@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,12 +35,6 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         View view;
-        // SqLite database handler
-        db = new SQLiteHandler(mContext);
-        // Fetching user details from sqlite
-        HashMap<String, String> user = db.getUserDetails();
-        //Id de l'usuari que esta realitzant lel registre
-        db_user_id = Integer.parseInt(user.get("user_id"));
 
         if (viewType == VIEW_TYPE_MESSAGE_SENT) {
             view = LayoutInflater.from(viewGroup.getContext())
@@ -64,16 +59,25 @@ public class MessageListAdapter extends RecyclerView.Adapter {
                 break;
             case VIEW_TYPE_MESSAGE_RECEIVED:
                 ((ReceivedMessageHolder) viewHolder).bind(message);
+                break;
         }
     }
 
     @Override
     public int getItemCount() {
+        Log.d("prueba Item count", String.valueOf(mMessageList.size()));
         return mMessageList.size();
     }
 
     @Override
     public int getItemViewType(int position) {
+        // SqLite database handler
+        db = new SQLiteHandler(mContext);
+        // Fetching user details from sqlite
+        HashMap<String, String> user = db.getUserDetails();
+        //Id de l'usuari que esta realitzant lel registre
+        db_user_id = Integer.parseInt(user.get("user_id"));
+
         final UserMessageDTO message = (UserMessageDTO) mMessageList.get(position);
 
         if (message.getMessageUserId()== db_user_id) {
@@ -101,7 +105,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             messageText.setText(message.getMessageText());
 
             // Format the stored timestamp into a readable String using method.
-            timeText.setText(String.valueOf(message.getMessageDate()));
+            timeText.setText(message.getMessageDate());
             nameText.setText(message.getMessageUserName());
 
             // Insert the profile image from the URL into the ImageView.
@@ -117,7 +121,6 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
         SentMessageHolder(View itemView) {
             super(itemView);
-
             messageText = (TextView) itemView.findViewById(R.id.text_message_body);
             timeText = (TextView) itemView.findViewById(R.id.text_message_time);
         }
@@ -126,7 +129,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
             messageText.setText(message.getMessageText());
             // Format the stored timestamp into a readable String using method.
-            timeText.setText(String.valueOf(message.getMessageDate()));
+            timeText.setText(message.getMessageDate());
         }
     }
 
