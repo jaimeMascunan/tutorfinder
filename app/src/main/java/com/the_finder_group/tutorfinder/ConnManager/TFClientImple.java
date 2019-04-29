@@ -2,7 +2,6 @@ package com.the_finder_group.tutorfinder.ConnManager;
 
 import android.content.Context;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,13 +124,13 @@ public class TFClientImple implements TFClient{
     }
 
     @Override
-    public boolean createMessage(Integer sender_id, String sender_name, String message, String date, Context context) {
-        return ServiceLocator.createMessage(sender_id, sender_name, message, date, context);
+    public boolean createMessage(Integer sender_id, String sender_name, String message, String date, Integer receiver_id, String receiver_name, Context context) {
+        return ServiceLocator.createMessage(sender_id, sender_name, message, date, receiver_id, receiver_name, context);
     }
 
     @Override
-    public List<UserMessageDTO> listMessagesByUser(Integer user_id, Context context) {
-        return ServiceLocator.listtMessagesByYser(user_id, context);
+    public List<UserMessageDTO> listMessagesByUser(Integer user_id, Integer receiver_id, Context context) {
+        return ServiceLocator.listtMessagesByYser(user_id, receiver_id, context);
     }
 }
 

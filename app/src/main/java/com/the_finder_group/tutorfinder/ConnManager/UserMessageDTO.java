@@ -8,6 +8,8 @@ public class UserMessageDTO {
     private String senderUserName;
     private String messageText;
     private String messageDate;
+    private int receiverUserId;
+    private String receiverUserName;
 
     public void setMessageId(int messageId) {
         this.messageId = messageId;
@@ -46,5 +48,13 @@ public class UserMessageDTO {
     public int getMessageId() {
         return messageId;
     }
+
+    public int getReceiverUserId() { return receiverUserId; }
+
+    public void setReceiverUserId(int receiverUserId) { this.receiverUserId = receiverUserId; }
+
+    public String getReceiverUserName() { return receiverUserName; }
+
+    public void setReceiverUserName(String receiverUserName) { this.receiverUserName = receiverUserName; }
 
 }

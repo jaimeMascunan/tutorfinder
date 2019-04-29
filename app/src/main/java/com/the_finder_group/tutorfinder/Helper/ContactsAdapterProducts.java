@@ -45,7 +45,8 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
     private AdDTO productToRemove, productToUpdate;
     private TextView ad_titol_edit, ad_preu_edit, ad_descripcio_edit;
     private AppCompatSpinner ad_type_ad_edit;
-    private Integer product_id, ad_user_booking_id, db_popup_option, db_user_id;
+    private Integer product_id, ad_user_id, ad_user_booking_id, db_popup_option, db_user_id;
+    private String ad_user_name;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView ad_title, ad_description, ad_price;
@@ -298,7 +299,13 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
                         break;
 
                     case R.id.menu_info_owner_product:
+                        ad_user_id = adDTO.getAdUserId();
+                        ad_user_name = adDTO.getUserName();
+
                         Intent intent = new Intent(context, MessageListActivity.class);
+                        intent.putExtra("ad_owner_id", String.valueOf(ad_user_id));
+                        intent.putExtra("ad_owner_name", ad_user_name);
+
                         context.startActivity(intent);
                         ((Activity)context).finish();
                         break;
@@ -327,7 +334,13 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
                         break;
 
                     case R.id.menu_contact_owner_product:
+                        ad_user_id = adDTO.getAdUserId();
+                        ad_user_name = adDTO.getUserName();
+
                         Intent intent = new Intent(context, MessageListActivity.class);
+                        intent.putExtra("ad_owner_id", String.valueOf(ad_user_id));
+                        intent.putExtra("ad_owner_name", ad_user_name);
+
                         context.startActivity(intent);
                         ((Activity)context).finish();
                         break;

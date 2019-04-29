@@ -147,13 +147,13 @@ public interface TFClient {
      * @param date
      * @return
      */
-    public boolean createMessage (Integer sender_id, String sender_name, String message, String date, Context context);
+    public boolean createMessage (Integer sender_id, String sender_name, String message, String date, Integer receiver_id, String receiver_name, Context context);
 
     /**
      *
      * @param user_id
      * @return
      */
-    public List<UserMessageDTO> listMessagesByUser (Integer user_id, Context context);
+    public List<UserMessageDTO> listMessagesByUser (Integer user_id, Integer receiver_id, Context context);
 
 }

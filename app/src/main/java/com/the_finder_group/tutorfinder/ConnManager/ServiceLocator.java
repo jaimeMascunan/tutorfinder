@@ -1065,7 +1065,7 @@ public class ServiceLocator  {
     }
 
     public static boolean createMessage(Integer sender_id, String sender_name, String message,
-                                        String date, Context context) {
+                                        String date, Integer receiver_id, String receiver_name, Context context) {
 
         boolean ret = false;
 
@@ -1087,6 +1087,8 @@ public class ServiceLocator  {
             dos.writeUTF(sender_name);
             dos.writeUTF(message);
             dos.writeUTF(date);
+            dos.writeInt(receiver_id);
+            dos.writeUTF(receiver_name);
             dos.flush();
 
             // Llegim la resposta
@@ -1113,7 +1115,7 @@ public class ServiceLocator  {
         return ret;
     }
 
-    public static List<UserMessageDTO> listtMessagesByYser(Integer user_id, Context context){
+    public static List<UserMessageDTO> listtMessagesByYser(Integer user_id, Integer receiver_id, Context context){
 
         List<UserMessageDTO> messages = new ArrayList<UserMessageDTO>();
 
@@ -1133,6 +1135,7 @@ public class ServiceLocator  {
             dos.writeInt(LIST_MESSAGES_BY_USER);
             //Enviem el tipus d'usuari que volem llistar
             dos.writeInt(user_id);
+            dos.writeInt(receiver_id);
             dos.flush();
 
             // Llegim la resposta
@@ -1148,6 +1151,8 @@ public class ServiceLocator  {
                 message.setMessageUserName(dis.readUTF());
                 message.setMessageText(dis.readUTF());
                 message.setMessageDate(dis.readUTF());
+                message.setReceiverUserId(dis.readInt());
+                message.setReceiverUserName(dis.readUTF());
                 messages.add(message);
             }
 

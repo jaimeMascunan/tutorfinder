@@ -1,5 +1,6 @@
 package com.the_finder_group.tutorfinder;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -36,8 +37,8 @@ public class MessageListActivity extends AppCompatActivity {
     private TFClientImple tfClientImple;
     private Helper helper;
     private Button send;
-    private Integer  db_user_id;
-    private String db_user_name, db_loggedUserType, message, timestamp;
+    private Integer  db_user_id, ad_owner_id;
+    private String db_user_name, db_loggedUserType, message, timestamp, ad_owner_name;
     private EditText chat_box;
 
     @Override
@@ -59,6 +60,13 @@ public class MessageListActivity extends AppCompatActivity {
 
         //TFClient implementation
         tfClientImple = new TFClientImple();
+
+        Intent intentGetAdDetails = getIntent();
+
+        if(intentGetAdDetails.hasExtra("ad_owner_id")) {
+            ad_owner_id = Integer.parseInt(intentGetAdDetails.getStringExtra("ad_owner_id"));
+            ad_owner_name = intentGetAdDetails.getStringExtra("ad_owner_name");
+        }
 
         helper = new Helper(getApplicationContext());
 
@@ -92,13 +100,15 @@ public class MessageListActivity extends AppCompatActivity {
         Log.d(TAG, "Send message");
         //Validem que les dades tinguin el format definit. En cas contrari informem a l'usuari/a
 
-        new sendMessage().execute(String.valueOf(db_user_id), db_user_name, message, timestamp);
+        new sendMessage().execute(String.valueOf(db_user_id),
+                db_user_name, message, timestamp,
+                String.valueOf(ad_owner_id), ad_owner_name);
 
     }
 
     private class sendMessage extends AsyncTask<String, Void, Boolean> {
-        String  message, userName, time;
-        Integer userId;
+        String  message, userName, time, adOwnerName;
+        Integer userId, adOwnerId;
 
         @Override
         protected void onPreExecute(){ }
@@ -109,8 +119,11 @@ public class MessageListActivity extends AppCompatActivity {
             userName = strings[1];
             message = strings[2];
             time = strings[3];
+            adOwnerId = Integer.parseInt(strings[4]);
+            adOwnerName = strings [5];
 
-            boolean publish = tfClientImple.createMessage(userId, userName, message, time , getApplicationContext());
+            boolean publish = tfClientImple.createMessage(userId, userName, message, time,
+                    adOwnerId, adOwnerName, getApplicationContext());
 
             return publish;
         }
@@ -126,7 +139,6 @@ public class MessageListActivity extends AppCompatActivity {
                 userMessageDTO.setMessageText(message);
                 userMessageDTO.setMessageDate(time);
                 messageList.add(userMessageDTO);
-                Log.d("prueba", userMessageDTO.getMessageText()) ;
             }
             // refreshing recycler view
             mMessageAdapter.notifyDataSetChanged();
