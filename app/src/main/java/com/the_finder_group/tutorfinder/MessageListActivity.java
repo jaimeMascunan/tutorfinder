@@ -3,6 +3,7 @@ package com.the_finder_group.tutorfinder;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,6 +23,8 @@ import com.the_finder_group.tutorfinder.Helper.SQLiteHandler;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +81,8 @@ public class MessageListActivity extends AppCompatActivity {
         db_user_name = user.get("name");
         db_loggedUserType = user.get(getResources().getString(R.string.user_type));
 
+        listPreviousMessages();
+
         send = (Button)findViewById(R.id.button_chatbox_send);
         send.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,7 +125,7 @@ public class MessageListActivity extends AppCompatActivity {
             message = strings[2];
             time = strings[3];
             adOwnerId = Integer.parseInt(strings[4]);
-            adOwnerName = strings [5];
+            adOwnerName = strings[5];
 
             boolean publish = tfClientImple.createMessage(userId, userName, message, time,
                     adOwnerId, adOwnerName, getApplicationContext());
@@ -138,8 +143,54 @@ public class MessageListActivity extends AppCompatActivity {
                 userMessageDTO.setMessageUserName(userName);
                 userMessageDTO.setMessageText(message);
                 userMessageDTO.setMessageDate(time);
+                userMessageDTO.setReceiverUserId(adOwnerId);
+                userMessageDTO.setReceiverUserName(adOwnerName);
                 messageList.add(userMessageDTO);
             }
+            // refreshing recycler view
+            mMessageAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void listPreviousMessages(){
+        Log.d(TAG, "Retrieve previous messages");
+        //Validem que les dades tinguin el format definit. En cas contrari informem a l'usuari/a
+
+        new listPreviousMessages().execute(String.valueOf(db_user_id), String.valueOf(ad_owner_id));
+
+    }
+
+    private class listPreviousMessages extends AsyncTask<String, Void, List<UserMessageDTO>> {
+        Integer userId, adOwnerId;
+
+        @Override
+        protected void onPreExecute(){ }
+
+        @Override
+        protected List<UserMessageDTO> doInBackground(String... strings) {
+            userId = Integer.parseInt(strings[0]);
+            adOwnerId = Integer.parseInt(strings[1]);
+
+            List<UserMessageDTO> messageListSent = tfClientImple.listMessagesByUser(userId, adOwnerId, getApplicationContext());
+            List<UserMessageDTO> messageListReceived = tfClientImple.listMessagesByUser(adOwnerId, userId, getApplicationContext());
+            List <UserMessageDTO> list = new ArrayList<>();
+            list.addAll(messageListSent);
+            list.addAll(messageListReceived);
+
+            Collections.sort(list, new Comparator<UserMessageDTO>() {
+                @Override
+                public int compare(@NonNull UserMessageDTO userMessage1, UserMessageDTO userMessage2) {
+                    return Integer.valueOf(userMessage1.getMessageId()).compareTo(Integer.valueOf(userMessage2.getMessageId()));
+                }
+            });
+            return list;
+        }
+
+        @Override
+        protected void onPostExecute(List<UserMessageDTO> result){
+            super.onPostExecute(result);
+            messageList.clear();
+            messageList.addAll(result);
             // refreshing recycler view
             mMessageAdapter.notifyDataSetChanged();
         }

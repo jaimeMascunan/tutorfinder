@@ -3,8 +3,6 @@ package com.the_finder_group.tutorfinder.Helper;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +15,10 @@ import com.the_finder_group.tutorfinder.R;
 import java.util.HashMap;
 import java.util.List;
 
-public class MessageListAdapter extends RecyclerView.Adapter {
+import static android.support.v7.widget.RecyclerView.Adapter;
+import static android.support.v7.widget.RecyclerView.ViewHolder;
+
+public class MessageListAdapter extends Adapter {
     private Context mContext;
     private List<UserMessageDTO> mMessageList;
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
@@ -30,10 +31,9 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         mMessageList = messageList;
     }
 
-
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         View view;
 
         if (viewType == VIEW_TYPE_MESSAGE_SENT) {
@@ -50,8 +50,9 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         final UserMessageDTO message = (UserMessageDTO) mMessageList.get(position);
+
 
         switch (viewHolder.getItemViewType()) {
             case VIEW_TYPE_MESSAGE_SENT:
@@ -65,7 +66,6 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        Log.d("prueba Item count", String.valueOf(mMessageList.size()));
         return mMessageList.size();
     }
 
@@ -79,7 +79,6 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         db_user_id = Integer.parseInt(user.get("user_id"));
 
         final UserMessageDTO message = (UserMessageDTO) mMessageList.get(position);
-
         if (message.getMessageUserId()== db_user_id) {
             // If the current user is the sender of the message
             return VIEW_TYPE_MESSAGE_SENT;
@@ -89,7 +88,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
+    private class ReceivedMessageHolder extends ViewHolder {
         TextView messageText, timeText, nameText;
         ImageView profileImage;
 
@@ -116,7 +115,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    private class SentMessageHolder extends RecyclerView.ViewHolder {
+    private class SentMessageHolder extends ViewHolder {
         TextView messageText, timeText;
 
         SentMessageHolder(View itemView) {

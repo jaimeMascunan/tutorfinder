@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.AppCompatSpinner;
 import android.util.Patterns;
@@ -14,6 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.the_finder_group.tutorfinder.AdminActivity;
+import com.the_finder_group.tutorfinder.ConnManager.UserMessageDTO;
 import com.the_finder_group.tutorfinder.LoginActivity;
 import com.the_finder_group.tutorfinder.R;
 import com.the_finder_group.tutorfinder.StudentActivity;
@@ -22,11 +24,8 @@ import com.the_finder_group.tutorfinder.TutorActivity;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.Timestamp;
 import java.security.spec.InvalidKeySpecException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.Comparator;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -361,5 +360,4 @@ public class Helper {
         }
         return bytes;
     }
-
 }

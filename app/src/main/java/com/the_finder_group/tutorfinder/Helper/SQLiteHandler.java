@@ -317,7 +317,6 @@ public class SQLiteHandler extends SQLiteOpenHelper {
             cursor.close();
             // return user
             db.setTransactionSuccessful();
-            Log.d(TAG, "Fetching user from Sqlite: " + user.toString());
         } catch (SQLiteException e) {
             e.printStackTrace();
 
