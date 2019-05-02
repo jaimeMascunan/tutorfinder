@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +25,6 @@ import java.util.List;
 public class FragmentAdsBookedByOthers extends Fragment {
 
     View v;
-    private static final int POPUP_MENU_BOOKED_COURSES = 3;
     private RecyclerView recyclerView;
     private List<AdDTO> productList;
     private ContactsAdapterProducts mAdapter;
@@ -57,14 +55,6 @@ public class FragmentAdsBookedByOthers extends Fragment {
         HashMap<String, String> user = db.getUserDetails();
         //Id de l'usuari que esta realitzant la consulta
         queryUserId = Integer.parseInt(user.get("user_id"));
-
-        if (((popupOption = (db.getOptionPopUP()))==null)||((db.getOptionPopUP()==0))) {
-            db.addPopUpOption(POPUP_MENU_BOOKED_COURSES);
-            Log.d("popupOption", String.valueOf(popupOption));
-        }else{
-            db.updateMenuPoputOption(popupOption, POPUP_MENU_BOOKED_COURSES);
-            Log.d("popupOption", String.valueOf(popupOption));
-        }
 
         //TFClient implementation
         tfClientImple = new TFClientImple();

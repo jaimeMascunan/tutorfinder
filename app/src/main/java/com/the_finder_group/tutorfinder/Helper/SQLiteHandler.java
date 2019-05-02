@@ -370,7 +370,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
             cursor.close();
             // return user
             db.setTransactionSuccessful();
-            Log.d(TAG, "Fetching image from Sqlite: " + popupOption.toString());
+            Log.d(TAG, "PopUp option seleccionada: " + popupOption.toString());
         } catch (SQLiteException e) {
             e.printStackTrace();
 
@@ -398,7 +398,6 @@ public class SQLiteHandler extends SQLiteOpenHelper {
             // Inserting Row
             long rows_affected = db.update(TABLE_POPUP_OPTIONS,  values, where, whereArgs);
             db.setTransactionSuccessful();
-            Log.d(TAG, "User pic edited on sqlite database. Rows affected: " + rows_affected);
         } catch (SQLiteException e) {
             e.printStackTrace();
 

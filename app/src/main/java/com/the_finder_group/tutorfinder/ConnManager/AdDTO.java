@@ -11,11 +11,10 @@ public class AdDTO {
     private int adTypeId;
     private String typesName;
     private int adPrice;
-
     private boolean reservat;
-    private int userReservat;
+    private int adUserReservaId;
+    private String adUserReservaName;
 
-    //Getters
 
     //Getters
     public int getAdId() {
@@ -54,11 +53,10 @@ public class AdDTO {
         return reservat;
     }
 
-    public int userReservat(){
-        return userReservat;
-    }
+    public int getAdUserReservaId() { return adUserReservaId; }
 
-    //Setters
+    public String getAdUserReservaName() { return adUserReservaName; }
+
     //Setters
     public void setAdId(int adId) {
         this.adId = adId;
@@ -96,9 +94,9 @@ public class AdDTO {
         this.reservat = reservat;
     }
 
-    public void setUserReservat (int userReservat){
-        this.userReservat = userReservat;
-    }
+    public void setAdUserReservaId(int adUserReservaId) { this.adUserReservaId = adUserReservaId; }
+
+    public void setAdUserReservaName(String adUserReservaName) { this.adUserReservaName = adUserReservaName; }
 }
 
 

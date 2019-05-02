@@ -727,11 +727,14 @@ public class ServiceLocator  {
 
                 product.setAdId(dis.readInt());
                 product.setAdUserId(dis.readInt());
+                product.setUserName(dis.readUTF());
                 product.setAdTittle(dis.readUTF());
                 product.setAdDescription(dis.readUTF());
                 product.setAdTypeId(dis.readInt());
                 product.setTypesName(dis.readUTF());
                 product.setAdPrice(dis.readInt());
+                product.setAdUserReservaId(dis.readInt());
+                product.setAdUserReservaName(dis.readUTF());
 
                 listProducts.add(product);
             }
@@ -793,11 +796,14 @@ public class ServiceLocator  {
 
                 product.setAdId(dis.readInt());
                 product.setAdUserId(dis.readInt());
+                product.setUserName(dis.readUTF());
                 product.setAdTittle(dis.readUTF());
                 product.setAdDescription(dis.readUTF());
                 product.setAdTypeId(dis.readInt());
                 product.setTypesName(dis.readUTF());
                 product.setAdPrice(dis.readInt());
+                product.setAdUserReservaId(dis.readInt());
+                product.setAdUserReservaName(dis.readUTF());
 
                 listProducts.add(product);
             }
@@ -923,7 +929,7 @@ public class ServiceLocator  {
         return ret;
     }
 
-    public static boolean adsBookByUser(Integer ad_id, Integer ad_user_booking_id, Context context) {
+    public static boolean adsBookByUser(Integer ad_id, Integer ad_user_booking_id, String ad_user_booking_name, Context context) {
 
         boolean ret = false;
 
@@ -943,6 +949,7 @@ public class ServiceLocator  {
             dos.writeInt(BOOKING_PRODUCT);
             dos.writeInt(ad_id);
             dos.writeInt(ad_user_booking_id);
+            dos.writeUTF(ad_user_booking_name);
 
             dos.flush();
 
@@ -1115,7 +1122,7 @@ public class ServiceLocator  {
         return ret;
     }
 
-    public static List<UserMessageDTO> listtMessagesByYser(Integer user_id, Integer receiver_id, Context context){
+    public static List<UserMessageDTO> listtMessagesByUser(Integer user_id, Integer receiver_id, Context context){
 
         List<UserMessageDTO> messages = new ArrayList<UserMessageDTO>();
 

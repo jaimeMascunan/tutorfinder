@@ -46,7 +46,7 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
     private TextView ad_titol_edit, ad_preu_edit, ad_descripcio_edit;
     private AppCompatSpinner ad_type_ad_edit;
     private Integer product_id, ad_user_id, ad_user_booking_id, db_popup_option, db_user_id;
-    private String ad_user_name;
+    private String ad_user_name, db_user_name, ad_user_booking_name;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView ad_title, ad_description, ad_price;
@@ -79,11 +79,10 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
         // SqLite database handler
         db = new SQLiteHandler(context);
         // Fetching user details from sqlite
-        db_popup_option = db.getOptionPopUP();
-        // Fetching user details from sqlite
         HashMap<String, String> user = db.getUserDetails();
         //Id de l'usuari que esta realitzant lel registre
         db_user_id = Integer.parseInt(user.get("user_id"));
+        db_user_name = user.get("name");
 
 
         //Alert dialog per la edicio del producte
@@ -109,7 +108,7 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
         registerDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                new registerProduct().execute(product_id, db_user_id);
+                new registerProduct().execute(String.valueOf(product_id), String.valueOf(db_user_id), db_user_name);
             }
         });
         registerDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -162,15 +161,17 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
                 // send selected contact in callback
                 //creating a popup menu
                 PopupMenu popup = new PopupMenu(context, holder.listItemOptions);
+                // Fetching user details from sqlite
+                db_popup_option = db.getOptionPopUP();
                 //inflating menu from xml resource
                 if(db_popup_option == POPUP_MENU_OWN_COURSES){
                     userPopUpMenu(popup, adDTO, position);
 
                 }else if (db_popup_option == POPUP_MENU_OTHER_COURSES){
-                    rolePopupMenu(popup, adDTO, position);
+                    rolePopupMenu(popup, adDTO);
 
                 }else if (db_popup_option == POPUP_MENU_BOOKED_COURSES){
-                    bookedPopupMenu(popup, adDTO, position);
+                    bookedPopupMenu(popup, adDTO);
                 }
             }
         });
@@ -283,7 +284,7 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
 
     }
 
-    public void rolePopupMenu(PopupMenu popup, final AdDTO adDTO, Integer position){
+    public void rolePopupMenu(PopupMenu popup, final AdDTO adDTO){
 
         popup.inflate(R.menu.menu_search_other_product);
         //adding click listener
@@ -318,9 +319,15 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
 
     }
 
-    public void bookedPopupMenu(PopupMenu popup, final AdDTO adDTO, Integer position){
+    public void bookedPopupMenu(PopupMenu popup, final AdDTO adDTO){
 
         popup.inflate(R.menu.menu_search_booked_product);
+        if (adDTO.getAdUserId() == db_user_id){
+            popup.getMenu().findItem(R.id.menu_contact_owner_product).setVisible(false);
+        }else{
+            popup.getMenu().findItem(R.id.menu_contact_user_reserved).setVisible(false);
+        }
+
         //adding click listener
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
@@ -329,19 +336,35 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
                     case R.id.menu_gestionar_inscripcio_product:
                         product_id = adDTO.getAdId();
                         Log.d("product_id", String.valueOf(product_id));
-                        cancelRegDialog.setMessage("Estas segur que vols cancelar la inscripcio a la classe seleccionada?");
+                        cancelRegDialog.setMessage("Estas segur que vols cancelar la seguent reserva");
                         cancelRegDialog.show();
                         break;
 
                     case R.id.menu_contact_owner_product:
                         ad_user_id = adDTO.getAdUserId();
+                        Log.d("userId propi", String.valueOf(ad_user_id));
                         ad_user_name = adDTO.getUserName();
+                        Log.d("userName propi", String.valueOf(ad_user_name));
 
-                        Intent intent = new Intent(context, MessageListActivity.class);
-                        intent.putExtra("ad_owner_id", String.valueOf(ad_user_id));
-                        intent.putExtra("ad_owner_name", ad_user_name);
+                        Intent intent_owner = new Intent(context, MessageListActivity.class);
+                        intent_owner.putExtra("ad_owner_id", String.valueOf(ad_user_id));
+                        intent_owner.putExtra("ad_owner_name", ad_user_name);
 
-                        context.startActivity(intent);
+                        context.startActivity(intent_owner);
+                        ((Activity)context).finish();
+                        break;
+
+                    case R.id.menu_contact_user_reserved:
+                        ad_user_id = adDTO.getAdUserReservaId();
+                        Log.d("userId reserva", String.valueOf(ad_user_id));
+                        ad_user_name = adDTO.getAdUserReservaName();
+                        Log.d("userName reserva", String.valueOf(ad_user_name));
+
+                        Intent intent_reserved = new Intent(context, MessageListActivity.class);
+                        intent_reserved.putExtra("ad_owner_id", String.valueOf(ad_user_id));
+                        intent_reserved.putExtra("ad_owner_name", ad_user_name);
+
+                        context.startActivity(intent_reserved);
                         ((Activity)context).finish();
                         break;
                 }
@@ -441,19 +464,21 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
      * Clase per realitzar la conexio amb la base de dades i esborrar un objete de tipus userDTO
      * en funcio de l'usarID d'aquest.
      */
-    private class registerProduct extends AsyncTask<Integer, Void, Boolean> {
+    private class registerProduct extends AsyncTask<String, Void, Boolean> {
 
         @Override
         protected void onPreExecute() {
         }
 
         @Override
-        protected Boolean doInBackground(Integer...integers) {
-            product_id = integers[0];
-            ad_user_booking_id = integers[1];
+        protected Boolean doInBackground(String...strings) {
+            product_id = Integer.parseInt(strings[0]);
+            ad_user_booking_id = Integer.parseInt(strings[1]);
+            ad_user_booking_name = strings[2];
 
 
-            boolean registrat = tfClientImple.bookAd(product_id, ad_user_booking_id, context);
+
+            boolean registrat = tfClientImple.bookAd(product_id, ad_user_booking_id, ad_user_booking_name , context);
             return registrat;
         }
 

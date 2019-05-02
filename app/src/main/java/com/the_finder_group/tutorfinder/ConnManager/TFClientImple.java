@@ -94,9 +94,9 @@ public class TFClientImple implements TFClient{
     }
 
     @Override
-    public boolean bookAd (Integer ad_id, Integer ad_user_booking_id, Context context){
+    public boolean bookAd (Integer ad_id, Integer ad_user_booking_id, String ad_user_booking_name, Context context){
 
-        return ServiceLocator.adsBookByUser(ad_id, ad_user_booking_id, context);
+        return ServiceLocator.adsBookByUser(ad_id, ad_user_booking_id, ad_user_booking_name, context);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class TFClientImple implements TFClient{
 
     @Override
     public List<UserMessageDTO> listMessagesByUser(Integer user_id, Integer receiver_id, Context context) {
-        return ServiceLocator.listtMessagesByYser(user_id, receiver_id, context);
+        return ServiceLocator.listtMessagesByUser(user_id, receiver_id, context);
     }
 }
 

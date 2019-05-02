@@ -13,4 +13,10 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/gris"/>
 
+    <item
+        android:id="@+id/menu_contact_user_reserved"
+        android:title="Contactar usuari"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/gris"/>
+
 </menu>

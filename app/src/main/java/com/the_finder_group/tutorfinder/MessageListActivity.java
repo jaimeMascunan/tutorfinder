@@ -112,8 +112,8 @@ public class MessageListActivity extends AppCompatActivity {
     }
 
     private class sendMessage extends AsyncTask<String, Void, Boolean> {
-        String  message, userName, time, adOwnerName;
-        Integer userId, adOwnerId;
+        String  message, userName, time, adReservaName;
+        Integer userId, adReservaId;
 
         @Override
         protected void onPreExecute(){ }
@@ -124,11 +124,11 @@ public class MessageListActivity extends AppCompatActivity {
             userName = strings[1];
             message = strings[2];
             time = strings[3];
-            adOwnerId = Integer.parseInt(strings[4]);
-            adOwnerName = strings[5];
+            adReservaId = Integer.parseInt(strings[4]);
+            adReservaName = strings[5];
 
             boolean publish = tfClientImple.createMessage(userId, userName, message, time,
-                    adOwnerId, adOwnerName, getApplicationContext());
+                    adReservaId, adReservaName, getApplicationContext());
 
             return publish;
         }
@@ -143,8 +143,8 @@ public class MessageListActivity extends AppCompatActivity {
                 userMessageDTO.setMessageUserName(userName);
                 userMessageDTO.setMessageText(message);
                 userMessageDTO.setMessageDate(time);
-                userMessageDTO.setReceiverUserId(adOwnerId);
-                userMessageDTO.setReceiverUserName(adOwnerName);
+                userMessageDTO.setReceiverUserId(adReservaId);
+                userMessageDTO.setReceiverUserName(adReservaName);
                 messageList.add(userMessageDTO);
             }
             // refreshing recycler view

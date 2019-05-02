@@ -113,7 +113,7 @@ public interface TFClient {
      * @param ad_user_booking_id
      * @return
      */
-    public boolean bookAd (Integer ad_id, Integer ad_user_booking_id, Context context);
+    public boolean bookAd (Integer ad_id, Integer ad_user_booking_id, String ad_user_booking_name, Context context);
 
     /**
      *

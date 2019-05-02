@@ -60,10 +60,10 @@ public class FragmentAdsBookedByUser extends Fragment {
 
         if (((popupOption = (db.getOptionPopUP()))==null)||((db.getOptionPopUP()==0))) {
             db.addPopUpOption(POPUP_MENU_BOOKED_COURSES);
-            Log.d("popupOption", String.valueOf(popupOption));
+            Log.d("popupOption user", String.valueOf(popupOption));
         }else{
             db.updateMenuPoputOption(popupOption, POPUP_MENU_BOOKED_COURSES);
-            Log.d("popupOption", String.valueOf(popupOption));
+            Log.d("popupOption user", String.valueOf(popupOption));
         }
 
         //TFClient implementation
