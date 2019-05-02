@@ -79,8 +79,6 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_POPUP_OPTIONS_TABLE);
 
         Log.d(TAG, "Database tables created");
-
-
     }
 
     /**
@@ -100,12 +98,16 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // Adding new image
+    /**
+     * Afegir una imatge en format blob a la base de dades locar
+     * @param user_id l'usuari al qual esta asignada la imatge
+     * @param imageBmp el mapa de bits de la imatge
+     */
     public void addImageBitmap(Integer user_id, Bitmap imageBmp) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         imageBmp.compress(Bitmap.CompressFormat.PNG, 100, out);
         byte[] buffer = out.toByteArray();
-
+        //Instanciem la base de dades i iniciem la transaccio segura
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
 
@@ -128,12 +130,16 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         }
     }
 
-    // Adding new image
+    /**
+     * Actualitzem la imatge de perfid d'un usuari a la base de dades local
+     * @param user_id l'identificadro de l'usuari per al que volem modificar la imatge de perfil
+     * @param imageBmp el bitmap corresponenr a la nova imatge
+     */
     public void updateImageBitmap(Integer user_id, Bitmap imageBmp) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         imageBmp.compress(Bitmap.CompressFormat.PNG, 100, out);
         byte[] buffer = out.toByteArray();
-
+        //Instanciem la base de dades i iniciem la transaccio segura
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
 
@@ -162,10 +168,14 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         }
     }
 
-    // Getting single image
+    /**
+     * Obtenim el bitmap que esta asignat a un usuari. Es a dir, la seva imatge de perfil
+     * @param id l'usuari per al qual volem obtenir la imatge
+     * @return la imatge de l'usuari en format bitmap
+     */
     public Bitmap getImagePath(int id) {
         Bitmap bitmap = null;
-
+        //Instanciem la base de dades i iniciem la transaccio segura
         SQLiteDatabase db = this.getReadableDatabase();
         db.beginTransaction();
 
@@ -201,6 +211,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
      * @param user_type el tipus d'usuari
      */
     public void addUser(Integer user_id, String name, String email, String password, String user_type) {
+        //Instanciem la base de dades i iniciem la transaccio segura
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
 
@@ -233,6 +244,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
      * @param email email introduit
      */
     public void editUser(Integer user_id, String name, String email, String user_type) {
+        //Instanciem la base de dades i iniciem la transaccio segura
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
 
@@ -262,11 +274,14 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     }
 
     /**
-     *
-     * @param userName
-     * @param password
+     * Editem el password de l'usuari que esta emmagatzemat a la base de dades local.
+     * Recordem que aquest usuari ens serveix per a veure qui esta loggegat en cada moment a l'aplicacio
+     * Nomes esta definida la posibilitat de que hi hagi un sol usuari al mateix tempps
+     * @param userName el nou nom per a l'usuari loggegat
+     * @param password el nou password encriptat per a l'usuari loggegat
      */
     public void editUserPassword(String userName, String password) {
+        //Instanciem la base de dades i iniciem la transaccio segura
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
 
@@ -299,7 +314,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     public HashMap<String, String> getUserDetails() {
         HashMap<String, String> user = new HashMap<String, String>();
         String selectQuery = "SELECT * FROM " + TABLE_USER;
-
+        //Instanciem la base de dades i iniciem la transaccio segura
         SQLiteDatabase db = this.getReadableDatabase();
         db.beginTransaction();
 
@@ -329,8 +344,13 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         return user;
     }
 
-    // Adding new image
+    /**
+     * Metode per assignar un nou popup menu option a l'item producte de la recycleview en funcio de la pantalla de l'aplicacio
+     * en la que estem situats
+     * @param option la nova opcio per al popup menu a visualitzar
+     */
     public void addPopUpOption(Integer option) {
+        //Instanciem la base de dades i iniciem la transaccio segura
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
 
@@ -352,11 +372,15 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         }
     }
 
-    // Getting single image
+    /**
+     * Metode per a obtenir la variable que definexi el popup menu a inflar en funcio de la pantalla de l'aplicacio
+     * en que es trobi l'usuari/a
+     * @return el valor per a la variable que indica quina layout de popupmenu inflar
+     */
     public Integer getOptionPopUP() {
         Integer popupOption = 0;
         String selectQuery = "SELECT * FROM " + TABLE_POPUP_OPTIONS;
-
+        //Instanciem la base de dades i iniciem la transaccio segura
         SQLiteDatabase db = this.getReadableDatabase();
         db.beginTransaction();
 
@@ -368,7 +392,6 @@ public class SQLiteHandler extends SQLiteOpenHelper {
                 popupOption = cursor.getInt(0);
             }
             cursor.close();
-            // return user
             db.setTransactionSuccessful();
             Log.d(TAG, "PopUp option seleccionada: " + popupOption.toString());
         } catch (SQLiteException e) {
@@ -383,8 +406,13 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         return popupOption;
     }
 
-    // Adding new image
+    /**
+     * Actualitzem el valor de la variable popupmenu en cas de que aquesta ja hagi estat inicialitzada
+     * @param previousOption la opcio que estaba introduida amb anterioritat
+     * @param newOption nova opcio per al popupmenu a inflar
+     */
     public void updateMenuPoputOption(Integer previousOption, Integer newOption) {
+        //Instanciem la base de dades i iniciem la transaccio segura
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
 
@@ -395,7 +423,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
             String where = KEY_POPUP_OPTION + " = ?";
             final String whereArgs[] = new String[] {String.valueOf(previousOption)};
 
-            // Inserting Row
+            // Inserting Row. Realment no realitzem cap operacio amb aquest valor a posterior
             long rows_affected = db.update(TABLE_POPUP_OPTIONS,  values, where, whereArgs);
             db.setTransactionSuccessful();
         } catch (SQLiteException e) {
@@ -410,9 +438,11 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Esborrem tots els usuaris de la base de dades
+     * Esborrem tots els usuaris de la base de dades i les opcions de menu escollides
+     * Deixem pero, les imatges definides per als diferents usuaris. Aquestes s'esborraran en desintalar la aplicacio
      * */
     public void deleteDB() {
+        //Instanciem la base de dades i iniciem la transaccio segura
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
 

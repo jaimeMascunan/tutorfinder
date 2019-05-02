@@ -1,5 +1,8 @@
 package com.the_finder_group.tutorfinder.ConnManager;
 
+/**
+ * Definicio dels atributs l'objecte anunci
+ */
 public class AdDTO {
 
     //Atributs

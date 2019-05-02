@@ -1,6 +1,10 @@
 package com.the_finder_group.tutorfinder.ConnManager;
 
 public class UserMessageDTO {
+    /**
+     * Definicio dels atributs de l'objecte missatge
+     * @author Jaime Mascuñan Xandro
+     */
 
     //Atributs
     private int messageId;

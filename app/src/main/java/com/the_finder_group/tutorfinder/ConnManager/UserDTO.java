@@ -1,7 +1,7 @@
 package com.the_finder_group.tutorfinder.ConnManager;
 
 /**
- *
+ * Definicio dels atributs de l'objecte user
  * @author José Luis Puentes Jiménez <jlpuentes74@gmail.com>
  */
 public class UserDTO {
