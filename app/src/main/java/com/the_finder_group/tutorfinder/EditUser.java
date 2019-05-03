@@ -23,8 +23,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
 
+/**
+ * Activitat per gestionar l'edicio de les deades d'un usuari emmagatzemades a la base de dades
+ */
 public class EditUser extends AppCompatActivity {
-
+    //Definim les variables de l'activitat
     private static final String TAG = EditUser.class.getSimpleName();
 
     private TextView txtName, txtEmail, txtOldPswd, txtOldPswdConfirm, txtNewPswd, edit_text_label;
@@ -46,7 +49,7 @@ public class EditUser extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_user);
-
+        //Inicialitzeem els diferents elements de la layout inflada
         txtName = (TextView) findViewById(R.id.edit_name);
         txtEmail = (TextView) findViewById(R.id.edit_email);
         edit_text_label = (TextView) findViewById(R.id.edit_spinner_text_label);
@@ -54,7 +57,7 @@ public class EditUser extends AppCompatActivity {
         btnSave = (Button) findViewById(R.id.save_changes_bttn);
         btnEditPswd = (Button) findViewById(R.id.canvi_password);
 
-        //Vista del canvi de contrasenya
+        //Vista del canvi de contrasenya. Inicialitzem els elements que aniran al dialog per al canvi de contrasenya
         LayoutInflater inflater = EditUser.this.getLayoutInflater();
         mView = inflater.inflate(R.layout.password_user_dialog, null);
         txtOldPswd = (TextView) mView.findViewById(R.id.edit_old_password);
@@ -74,7 +77,7 @@ public class EditUser extends AppCompatActivity {
             }
         });
 
-        //Alert dialog per al canvi de contrasenya
+        //Alert dialog per al canvi de contrasenya. Gestionarem el canvi de contrasenya amb aquest element
         canviPassword = new AlertDialog.Builder(this);
 
         // SqLite database handler
@@ -88,10 +91,10 @@ public class EditUser extends AppCompatActivity {
 
         // Fetching user details from sqlite
         HashMap<String, String> user = db.getUserDetails();
-
+        //Obtenim l'id del usuari que esta loggegat a l'aplicacio en aquests moments
         id = Integer.parseInt(user.get("user_id"));
 
-        //Per esborrar despres
+        //Obtenim la resta de dades d'aquest usuari
         Log.d(TAG, String.valueOf(id));
         name = user.get(getResources().getString(R.string.name));
         email = user.get(getResources().getString(R.string.email));
@@ -112,13 +115,11 @@ public class EditUser extends AppCompatActivity {
         }else if (user_type.equals("tutor")){
             selectionSpinner = 2;
         }else if (user_type.equals("admin")){
+            //Per a l'usuari admin amaguem la opcio de canvi de tipus d'usuari
             userType.setVisibility(View.INVISIBLE);
             edit_text_label.setVisibility(View.INVISIBLE);
         }
-
         userType.setSelection(selectionSpinner);
-
-
 
         // Logout button click event
         btnSave.setOnClickListener(new View.OnClickListener() {
@@ -135,32 +136,33 @@ public class EditUser extends AppCompatActivity {
                 if(mView.getParent() != null) {
                     ((ViewGroup)mView.getParent()).removeView(mView);
                 }
+                //Carregem la layout definid al dialog per al canvi de contrasenua
                 canviPassword.setView(mView);
                 canviPassword.setPositiveButton("Guardar canvis", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
-
-                        //Encripteem les dades introduides per l'usuari per fer la comprobacio
+                        //Obtenim les dades introduides per l'usuari/a per al canvi de contrasenya
                         String pswrd_old = txtOldPswd.getText().toString();
                         String pswrd_old_confirmacio = txtOldPswdConfirm.getText().toString();
                         String pswrd_new = txtNewPswd.getText().toString();
+                        //Comprobem que es compleixen els parametres establerts per al canvi de contrasenua
+                        //Encripteem les dades introduides per l'usuari per fer la comprobacio
                         switch ((validateOptions = helper.validate_edit_password(pswrd_old, pswrd_old_confirmacio,
                                 pswrd_new, password))) {
                             case 0:
                                 aDialog.setMessage("Las contraseñas a cambiar no coinciden o es incorrecta");
                                 aDialog.show();
                                 break;
-
                             case 1:
                                 aDialog.setMessage("La nueva contraseña no es correcta o no tiene un formato valido");
                                 aDialog.show();
                                 break;
-
                             case -1:
-                                // Si no s'ha entrat a modificar cap dada, en realitat si que actualitzem el valor
-                                //Pero amb el mateix que tenia abans
+                                // Si no s'ha entrat a modificar cap dada, en realitat si que actualitzem el valor pero amb el que estaba guardat a la base de dades
+                                //Realitzem la comprobacio de les dades pel canvi de contrasenya introduides per l'usuari
                                 if((txtNewPswd.getText().toString().trim().isEmpty())){ txtNewPswd.setText(password); };
                                 try {
+                                    //Encriptem el password nou introudit i l'emmagatzem a la base de dades
                                     new_pswd_encrypted = helper.generateStorngPasswordHash(txtNewPswd.getText().toString());
                                     new edit_user_password().execute(name, new_pswd_encrypted);
                                 } catch (NoSuchAlgorithmException e) {
@@ -172,7 +174,7 @@ public class EditUser extends AppCompatActivity {
                         }
                     }
                 });
-
+                //En cas de cancelar l'operacio, posem tots els cams a buit i activem el buto de canvi de password
                 canviPassword.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
@@ -183,39 +185,38 @@ public class EditUser extends AppCompatActivity {
                         btnEditPswd.setEnabled(true);
                     }
                 });
-
+                //Mostrem el dialog per al canvi de contrasenya
                 canviPassword.show();
             }
         });
     }
 
     /**
-     * Metode per realitzar la conexio al servidor i obtenir un boolea en funcio de si s'ha trobat
-     * una coincidencia o no amb els registres guardats a la base de dades
+     * Metode per realitzar la conexio al servidor i editar les dades de l'usuari.
      */
     public void edit_user() {
-
+        //Validem que les dades de l'usuari siguin correctes
         if (!helper.validate_edit_user(txtName, txtEmail)) {
             aDialog.setMessage("No s'ha pogut realitzar el canvi de dades. Aquestes no soon correctes");
             aDialog.show();
             return;
         }
-
+        //En cas de que la selecio del tipus d'usuari estigui buida, vol dir que es tracta d'un usuari admin
         if (userType.getSelectedItem().toString().equals("")){
             new edit_user().execute(String.valueOf(id), txtName.getText().toString().trim(),
                     txtEmail.getText().toString().trim(), "admin");
 
         }else{
+            //De tenir una seleccio per al tipus d'usuari, es tracta d'un estudiant o tutor
             new edit_user().execute(String.valueOf(id), txtName.getText().toString().trim(),
                     txtEmail.getText().toString().trim(), userType.getSelectedItem().toString());
         }
-
-
+        //Informem de la operacio a realitzar
         Log.d(TAG, "Edit usuari");
     }
 
     /**
-     * Clase per realitzar la conexio amb la base de dades. Aquesta taska rebra parametres de tipus string
+     * Clase per realitzar la conexio amb la base de dades. Aquesta tasca rebra parametres de tipus string
      * retornara un boolea i no definim cap tipus d'unitat de progressio
      */
     private class edit_user extends AsyncTask<String, Void, Boolean> {
@@ -229,7 +230,7 @@ public class EditUser extends AppCompatActivity {
         }
 
         @Override
-        //Instaniem un objecte de la clase tfClientImpl per realitzar la conexio
+        //Instaniem un objecte de la clase tfClientImpl per realitzar la conexio i obtenim els parametres
         protected Boolean doInBackground(String... strings) {
             userId = strings[0];
             userName = strings[1];
@@ -244,14 +245,12 @@ public class EditUser extends AppCompatActivity {
         /**
          * Amaguem el progres dialog. En cas que s'hagi trobat un usuari que concideixi amb les credencials pasades,
          * l'afegim a la base de dades local, modifiquem el valor de la sessio i redirigim a la activitat corresponent.
-         * En aquest cas encara falta implementar la conexio a la base de dades i per aixo definim "admin"
          */
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
             hideDialog();
             if (result != null) {
                 db.editUser(Integer.parseInt(userId), userName, email, user_type);
-
                 helper.redirectUserTypeAct(user_type);
                 finish();
 
@@ -263,8 +262,8 @@ public class EditUser extends AppCompatActivity {
     }
 
     /**
-     * Clase per realitzar la conexio amb la base de dades. Aquesta taska rebra parametres de tipus string
-     * retornara un boolea i no definim cap tipus d'unitat de progressio
+     * Clase per realitzar la conexio amb la base de dades per editar el password d'un usuari
+     * Aquesta taska rebra parametres de tipus string.retornara un boolea i no definim cap tipus d'unitat de progressio
      */
     private class edit_user_password extends AsyncTask<String, Void, Boolean> {
         String userName, password;

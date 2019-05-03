@@ -48,7 +48,7 @@ public class SignupActivity extends AppCompatActivity {
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
-
+        //Inicialitzem les variables/buttons amb els id presents a la layout inflada
         name_signup = (EditText) findViewById(R.id.input_name_signup);
         email_signup = (EditText) findViewById(R.id.input_email_signup);
         password_signup = (EditText) findViewById(R.id.input_password_signup);
@@ -132,41 +132,40 @@ public class SignupActivity extends AppCompatActivity {
             aDialog.show();
             return;
         }
-
+        //Obtenim els valors introduits per l'usuari/a al layout de registre
         String name = name_signup.getText().toString().trim();
         String email = email_signup.getText().toString().trim();
         String password = password_signup.getText().toString().trim();
         //Encriptem el password
         String hashed_password = helper.generateStorngPasswordHash(password);
-
+        //Obtenim el tipus d'usuari seleccionat
         String user_type = user_type_login.getSelectedItem().toString();
         //Llancem l'asynctask per realitzar la conexio en segon pla
         new registerUser().execute(name, email, hashed_password, user_type);
     }
     /**
      * Clase per realitzar la conexio amb la base de dades i guardar un objecte de tipus usuari
-     * En aquests moments encara no tenim implementada aquesta funcio i per tant aquest apartat no es funcional
      */
     private class registerUser extends AsyncTask<String, Void, Boolean> {
         String userName, email, password, user_type;
-
+        //Mostrem el progress dialog mentre es realitza la transaccio
         @Override
         protected void onPreExecute(){
             pDialog.setMessage("Registering");
             showDialog();
         }
-
+        //Obtenim els valors passats per parametre i contectem amb la base de dades per realitzar el registre d'usuari
         @Override
         protected Boolean doInBackground(String... strings) {
             userName = strings[0];
             email = strings[1];
             password = strings[2];
             user_type = strings[3];
-
+            //Obtindrem true de haver-se realitzat amb exit
             boolean register = tfClientImple.newUser(userName, email, password, user_type, getApplicationContext());
             return register;
         }
-
+        //En cas de haver realitzat el registre amb exit, redirigim a l'usuari a l'activitat login
         @Override
         protected void onPostExecute(Boolean result){
             super.onPostExecute(result);

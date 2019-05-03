@@ -30,14 +30,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Activitat principal per un usuari de tipus student
- * Queda per implementar la logica de l'aplicacio
  */
 public class StudentActivity extends AppCompatActivity {
-
+    //Constant per a llistar els anuncis de tutors
     private int USER_CODE_TUTORS = 2;
+    //COnstants per solicitar acces al emmagatzenament intern i galeria de imatge
     private int STORAGE_PERMISSION_CODE= 1111;
     private int GALLERY_REQUEST_CODE = 1112;
-
+    //Declarem variables
     private TextView txtName;
     private CircleImageView userPhoto;
     private CardView publicarAnunci, cercarCursos, gestionarCursosPropis, veureBookedCursos;
@@ -51,11 +51,13 @@ public class StudentActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_student);
+        //Afegit el toolbar amb les opcions per als estudiannts. Aquestes son logout, settings i edituser
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar_student);
         setSupportActionBar(myToolbar);
         ActionBar actionBar  = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
 
+        //Inicialitzem  els diferents elements de la layout
         txtName = (TextView) findViewById(R.id.user_name);
         userPhoto = (CircleImageView) findViewById(R.id.user_photo);
         publicarAnunci = (CardView) findViewById(R.id.card_view_publish_ad);
@@ -96,7 +98,7 @@ public class StudentActivity extends AppCompatActivity {
                 }
             }
         });
-
+        //Si l'usuari/a selecciona aquesta cardview, llancem l'activity per afegir un anunci
         publicarAnunci.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,7 +107,8 @@ public class StudentActivity extends AppCompatActivity {
                 finish();
             }
         });
-
+        //En seleccionar la cardview de cerca de cursos, llancem l'activitat per llistar tots els cursos no reservats de tutors
+        //Al put extra, definim que volem veure nomes els cursos dels tutors
         cercarCursos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -115,7 +118,8 @@ public class StudentActivity extends AppCompatActivity {
                 finish();
             }
         });
-
+        //LLancem l'activitat, en que podrem llistar els nostres cursos publicats
+        //Amb el put extra, definim que volem veure els nostres cursos publicats, tant disponibls com no
         gestionarCursosPropis.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,7 +129,8 @@ public class StudentActivity extends AppCompatActivity {
                 finish();
             }
         });
-
+        //Amb aquesta cardview, llancem l'activity per a veure els nostres cursos reservats per altres usuaris
+        //Tambe veiem els cursos d'altres usuaris que hem reservat nosaltres
         veureBookedCursos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -161,13 +166,12 @@ public class StudentActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    @Override
-    public void onBackPressed(){
-        //desabilitamos volver atras de la MainActivity
-        moveTaskToBack(true);
-    }
-
+    /**
+     * Metode que gestiona la seleccio d'imatge per al perfil que hem realitzat amb el helper
+     * @param requestCode codi que identifica l'intent de l'startactivityforresult
+     * @param resultCode el resultat obtingut
+     * @param data les dades obtingudes
+     */
     public void onActivityResult(int requestCode,int resultCode, Intent data) {
         // Result code is RESULT_OK only if the user selects an Image
         if (resultCode == Activity.RESULT_OK)
@@ -198,6 +202,12 @@ public class StudentActivity extends AppCompatActivity {
             }
     }
 
+    /**
+     * Metode que gestiona si podem o no seleccionar una imatge de la galeria en funcio de l'eleccio de l'usuari en temps d'execucio
+     * @param requestCode el codi que identifica l'startactivityforresult
+     * @param permissions els permissos solicitats
+     * @param grantResults el resultat
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
         if(requestCode == STORAGE_PERMISSION_CODE){
@@ -206,4 +216,11 @@ public class StudentActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public void onBackPressed(){
+        //desabilitamos volver atras de la MainActivity
+        moveTaskToBack(true);
+    }
+
 }

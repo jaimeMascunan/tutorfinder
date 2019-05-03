@@ -102,8 +102,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Metode per realitzar la conexio al servidor i obtenir un boolea en funcio de si s'ha trobat
-     * una coincidencia o no amb els registres guardats a la base de dades
+     * Metode per realitzar la conexio al servidor i obtenir un string amb
+     * la contrasenya guardada a la base de dades en funcio de si s'ha trobat
+     * una coincidencia o no amb els registres guardats en aquesta
      */
     public void login(){
 
@@ -114,7 +115,7 @@ public class LoginActivity extends AppCompatActivity {
             aDialog.show();
             return;
         }
-
+        //Obtenim les dades els textview coorresponents
         String name = name_login.getText().toString();
         String password = password_login.getText().toString();
 
@@ -123,8 +124,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Clase per realitzar la conexio amb la base de dades. Aquesta taska rebra parametres de tipus string
-     * retornara un boolea i no definim cap tipus d'unitat de progressio
+     * Clase per realitzar la conexio amb la base de dades. Aquesta tasca rebra parametres de tipus string
+     * retornara un string i no definim cap tipus d'unitat de progressio
      */
     private class checkLogin extends AsyncTask<String, Void, UserDTO> {
         String userName, password;
@@ -137,15 +138,16 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         @Override
-        //Instaniem un objecte de la clase tfClientImpl per realitzar la conexio
+        //Instaniem un objecte de la clase tfClientImpl per realitzar la conexio i obtenim els parametres
         protected UserDTO doInBackground(String... strings) {
             userName = strings[0];
             password = strings[1];
             UserDTO userDTO = null;
             boolean login = false;
+            //Obtenim el password desat a la base de dades per aquest usuari
             String storedPassword = tfClientImple.login(userName, getApplicationContext());
 
-            //Validem que el password introdui i el de la base de dades coincideixin
+            //Validem que el password introduit i el de la base de dades coincideixin
             try {
                 if(!(storedPassword.equals(""))){
                     login = helper.validatePassword(password, storedPassword);
@@ -169,7 +171,6 @@ public class LoginActivity extends AppCompatActivity {
         /**
          * Amaguem el progres dialog. En cas que s'hagi trobat un usuari que concideixi amb les credencials pasades,
          * l'afegim a la base de dades local, modifiquem el valor de la sessio i redirigim a la activitat corresponent.
-         * En aquest cas encara falta implementar la conexio a la base de dades i per aixo definim "admin"
          */
         protected void onPostExecute(UserDTO result){
             super.onPostExecute(result);

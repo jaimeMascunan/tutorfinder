@@ -29,14 +29,13 @@ import java.util.HashMap;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
- * Activitat principal per un usuari de tipus student
- * Queda per implementar la logica de l'aplicacio
+ * Activitat principal per un usuari de tipus administrador
  */
 public class AdminActivity extends AppCompatActivity {
-
+    //Constants per l'acces a l'emmagatzament intern del telefon i la galeria d'imatges
     private int STORAGE_PERMISSION_CODE= 1111;
     private int GALLERY_REQUEST_CODE = 1112;
-
+    //Declarem les diferents variables
     private TextView txtName;
     private CircleImageView userPhoto;
     private CardView llistarUsuaris, llistarProductes;
@@ -47,16 +46,16 @@ public class AdminActivity extends AppCompatActivity {
     private String name, user_id;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_admin);
+        //Definim la toolbar per a l'usuari admin
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar_admin);
         setSupportActionBar(myToolbar);
         ActionBar actionBar  = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
-
+        //Inicialitzem els diferents elements de la layout
         txtName = (TextView) findViewById(R.id.user_name);
         userPhoto = (CircleImageView) findViewById(R.id.user_photo);
         llistarUsuaris = (CardView) findViewById(R.id.card_view_llistar_usuaris);
@@ -65,6 +64,7 @@ public class AdminActivity extends AppCompatActivity {
         // SqLite database handler
         db = new SQLiteHandler(getApplicationContext());
 
+        //Helper amb els diferents metodes de suport
         helper = new Helper(AdminActivity.this);
 
         // Fetching user details from sqlite
@@ -94,7 +94,7 @@ public class AdminActivity extends AppCompatActivity {
                 }
             }
         });
-
+        //En seleccionar aquesta cardview, l'usuari admin obtindra un llistat de tots els usuaris de l'aplicacio
         llistarUsuaris.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,7 +103,11 @@ public class AdminActivity extends AppCompatActivity {
                 finish();
             }
         });
-
+        /**
+         * //En seleccionar aquesta cardvieb, l'usuari admin obtindra un llistat de tots els anuncis publicats per usuaris
+         * Aquest es troba dividit en dos fragments, un pers usuaris estudiants, i l'altre per als tutors
+         * Pot veure tots els anuncis tant publicats com np
+         */
         llistarProductes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,6 +129,7 @@ public class AdminActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
+            //Opcio de la toolbar per editar les dades de l'usuari admin logegat
             case R.id.action_edit_user:
                 Intent intent = new Intent(AdminActivity.this, EditUser.class);
                 startActivity(intent);
@@ -133,12 +138,19 @@ public class AdminActivity extends AppCompatActivity {
             case R.id.action_setting:
                 return true;
             case R.id.action_logout:
+                //Sortim de l'aplicacio i esborrem l'usuari de la base de dades local.
                 helper.logoutUser();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+    /**
+     * Metode que gestiona si podem o no seleccionar una imatge de la galeria en funcio de l'eleccio de l'usuari en temps d'execucio
+     * @param requestCode el codi que identifica l'startactivityforresult
+     * @param permissions els permissos solicitats
+     * @param grantResults el resultat
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
         if(requestCode == STORAGE_PERMISSION_CODE){
@@ -147,7 +159,12 @@ public class AdminActivity extends AppCompatActivity {
             }
         }
     }
-
+    /**
+     * Metode que gestiona la seleccio d'imatge per al perfil que hem realitzat amb el helper
+     * @param requestCode codi que identifica l'intent de l'startactivityforresult
+     * @param resultCode el resultat obtingut
+     * @param data les dades obtingudes
+     */
     public void onActivityResult(int requestCode,int resultCode, Intent data){
         // Result code is RESULT_OK only if the user selects an Image
         if (resultCode == Activity.RESULT_OK)
