@@ -42,7 +42,7 @@ public class Helper {
     private int GALLERY_REQUEST_CODE = 1112;
 
     /**
-     * constrictor de la clase en que pasem un context com a parametre que s'ha indicat al inicialitzar la clase
+     * constructor de la clase en que pasem un context com a parametre que s'ha indicat al inicialitzar la clase
      * @param context
      */
     public Helper(Context context) {

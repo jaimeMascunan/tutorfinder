@@ -27,7 +27,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Clase que obte el llistat d'usuaris de l'aplicacio que passarem al adapter de la recycleview per mostrarlos
+ */
 public class LlistarUsers extends AppCompatActivity {
+    //Declarem les varialbes de l'activitat
     private static final String TAG = LlistarUsers.class.getSimpleName();
     private RecyclerView recyclerView;
     private ArrayList<UserDTO> contactList;
@@ -43,14 +47,18 @@ public class LlistarUsers extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_llistar_users);
+        //Afegim el toolbar
         Toolbar toolbar = findViewById(R.id.toolbar_search);
         setSupportActionBar(toolbar);
 
         // toolbar fancy stuff
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        //Inicialitzem la view de la recycleview
         recyclerView = findViewById(R.id.recycler_view);
+        //Inicialitzem el arraylost dels objectes userDTO que obtindreem
         contactList = new ArrayList<>();
+        //Inicialitzem l'adaptador que omplira la vista
         mAdapter = new ContactsAdapterUsers(this, contactList);
 
         //TFClient implementation
@@ -66,11 +74,12 @@ public class LlistarUsers extends AppCompatActivity {
         // white background notification bar
         whiteNotificationBar(recyclerView);
 
+        //Posem en marxa la recycleview
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
-
+        //Obtenim el llistat d'usuaris de la aplicacio
         fetchContacts();
     }
 
@@ -81,6 +90,10 @@ public class LlistarUsers extends AppCompatActivity {
         new obtindreLlistat().execute();
     }
 
+    /**
+     * Clase per realitzar la conexio amb la base de dades per obtenir un llistat d'usuaris de l'aplicacio
+     * Aquesta taska rebra parametres de tipus string.retornara una lista d'objectes userDTO i no definim cap tipus d'unitat de progressio
+     */
     private class obtindreLlistat extends AsyncTask<String, Void, List<UserDTO>> {
 
         @Override
@@ -102,9 +115,9 @@ public class LlistarUsers extends AppCompatActivity {
             return llistatUsuaris;
         }
         @Override
-
         protected void onPostExecute(List<UserDTO> result) {
             super.onPostExecute(result);
+            //Afegim els resultats obtinguts a la llista de la recycleview
             contactList.clear();
             contactList.addAll(result);
             // refreshing recycler view
@@ -113,6 +126,10 @@ public class LlistarUsers extends AppCompatActivity {
     }
 
     @Override
+    /**
+     * Menu per a implementar la filtracio dels resultats introduint text. Aquest es comparara amb el nom dels usuaris
+     * per nomes mostrar els que coincideixin
+     */
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_search, menu);
 
@@ -154,6 +171,7 @@ public class LlistarUsers extends AppCompatActivity {
         if (id == R.id.action_search) {
             return true;
         }
+        //COm l'usuari admin es l'unic que pot definir aquest llistat, tornem a l'activitat per aquest usuari
         if(id == android.R.id.home) {
             Intent intent = new Intent(getApplicationContext(), AdminActivity.class);
             startActivity(intent);

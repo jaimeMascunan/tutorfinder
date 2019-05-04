@@ -19,6 +19,9 @@ import com.the_finder_group.tutorfinder.Helper.SQLiteHandler;
 
 import java.util.HashMap;
 
+/**
+ * Classe que implementa la publicacio d'anuncis per part d'usuaris
+ */
 public class AdActivity extends AppCompatActivity {
 
     //Definim les variables
@@ -40,18 +43,18 @@ public class AdActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ad);
-
+        //Inicialitzem els diferents elements de la layout
         ad_titol = (EditText)findViewById(R.id.ad_title);
         ad_descripcio = (EditText)findViewById(R.id.ad_descripcio);
         ad_preu = (EditText)findViewById(R.id.ad_price);
         publish_btn = (Button)findViewById(R.id.publish_ad);
         ad_type = (AppCompatSpinner) findViewById(R.id.ad_type_spinner);
 
-        // Progress dialog
+        // Progress dialog per mostrar el progres de l'asynctask
         pDialog = new ProgressDialog(this);
         pDialog.setCancelable(false);
 
-        //Alert dialog
+        //Alert dialog que demana confirmacio del usuari a l'hora de publicar anunci
         aDialog = new AlertDialog.Builder(this);
         aDialog.setTitle("Publicar anunci");
         aDialog.setIcon(android.R.drawable.ic_dialog_info);
@@ -78,7 +81,7 @@ public class AdActivity extends AppCompatActivity {
                 R.array.ad_typer_publish, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         ad_type.setAdapter(adapter);
-
+        //Implementem el onclicklistener per al boto que confirma la publicacio de l'anunci amb les dades introduides per l'usuari
         publish_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,31 +102,33 @@ public class AdActivity extends AppCompatActivity {
             return;
         }
         String categoria = ad_type.getSelectedItem().toString();
+        //Abans de guardar l'anunci necessitem obtenir el id de l'anunci que es correspon a la categoria escollida
         new getAdTypeByName().execute(categoria);
 
     }
     /**
      * Clase per realitzar la conexio amb la base de dades i guardar un objecte de tipus usuari
-     * En aquests moments encara no tenim implementada aquesta funcio i per tant aquest apartat no es funcional
      */
     private class publishAd extends AsyncTask<String, Void, Boolean> {
         String  titol, descripcio, disponibilitat;
         Integer userId, preu, adTypeId;
 
         @Override
+        //Mmpstrem el progres dialog mentre conectem a la base de dades
         protected void onPreExecute(){
             pDialog.setMessage("Publishing");
             showDialog();
         }
 
         @Override
+        //Obtenim els valors pasats per parametre
         protected Boolean doInBackground(String... strings) {
             userId = Integer.parseInt(strings[0]);
             titol = strings[1];
             descripcio = strings[2];
             preu = Integer.parseInt(strings[3]);
             adTypeId = Integer.parseInt(strings[4]);
-
+            //TFC implementation per a crear l'objecte anunci a la base da dades per aquest usuari
             boolean publish = tfClientImple.createAd(userId, titol, descripcio, adTypeId, preu, getApplicationContext());
             return publish;
         }
@@ -131,6 +136,8 @@ public class AdActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean result){
             super.onPostExecute(result);
+            //En cas que el resultat sigui true, amagem el progresdialog i redirecionem
+            // a l'usuari a la pantalla principal en funcio del seu tipus
             hideDialog();
             if (result){
                 helper.redirectUserTypeAct(userType);
@@ -142,17 +149,18 @@ public class AdActivity extends AppCompatActivity {
     }
 
     /**
-     * Clase per realitzar la conexio amb la base de dades i guardar un objecte de tipus usuari
-     * En aquests moments encara no tenim implementada aquesta funcio i per tant aquest apartat no es funcional
+     * Clase per realitzar la conexio amb la base de dades i obtenir l'id que correspon al nom d'una categoria
      */
     private class getAdTypeByName extends AsyncTask<String, Void, Integer> {
         String categoria;
 
         @Override
+        //En aquest cas no volem que l'usuari sigui conscient, i per tant no declarem el progresdialog
         protected void onPreExecute(){}
 
         @Override
         protected Integer doInBackground(String... strings) {
+            //Obtenim els parametres i conectem amb la base de dades
             categoria = strings[0];
             Integer adTypeId = tfClientImple.getAdTypeByName(categoria, getApplicationContext());
             Log.d(TAG, String.valueOf(adTypeId));
@@ -162,7 +170,7 @@ public class AdActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer result){
             super.onPostExecute(result);
-
+            //Una vegada em obtingut l'id, ja podem realitzar la publicacio de l'anunci amb les dades en el format adequat
             String titol = ad_titol.getText().toString().trim();
             String descripcio = ad_descripcio.getText().toString().trim();
             String preu = ad_preu.getText().toString().trim();
