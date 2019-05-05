@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
@@ -46,10 +47,11 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
     private TFClientImple tfClientImple;
     private AlertDialog.Builder deleteDialog, registerDialog, confirmDialog, edit_ad_dialog, cancelRegDialog;
     private AdDTO productToRemove, productToUpdate;
-    private TextView ad_titol_edit, ad_preu_edit, ad_descripcio_edit;
+    private EditText ad_titol_edit, ad_preu_edit, ad_descripcio_edit;
     private AppCompatSpinner ad_type_ad_edit;
     private Integer product_id, ad_user_id, ad_user_booking_id, db_popup_option, db_user_id;
     private String ad_user_name, db_user_name, ad_user_booking_name;
+    private Helper helper;
 
     /**
      * viewHolder en que definim els diferent slemenets a mostrar i els inicialitzem
@@ -90,6 +92,8 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
 
         //Instanciem el server
         tfClientImple = new TFClientImple();
+        //Acces als metodes de suport de l'aplicacio
+        helper = new Helper(context);
         // SqLite database handler
         db = new SQLiteHandler(context);
         // Fetching user details from sqlite
@@ -258,9 +262,9 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
                     //Vista de la edicio del anunci. Primer iniciem les variables i mostrem el alertdialog per a la edicio
                     LayoutInflater inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
                     View productItemView = inflater.inflate(R.layout.edit_ad_dialog, null);
-                    ad_titol_edit = (TextView)productItemView.findViewById(R.id.ad_title_edit);
-                    ad_descripcio_edit = (TextView)productItemView.findViewById(R.id.ad_descripcio_edit);
-                    ad_preu_edit = (TextView)productItemView.findViewById(R.id.ad_price_edit);
+                    ad_titol_edit = (EditText) productItemView.findViewById(R.id.ad_title_edit);
+                    ad_descripcio_edit = (EditText) productItemView.findViewById(R.id.ad_descripcio_edit);
+                    ad_preu_edit = (EditText) productItemView.findViewById(R.id.ad_price_edit);
                     ad_type_ad_edit = (AppCompatSpinner)productItemView.findViewById(R.id.ad_type_spinner_edit);
 
                     //Adaptador de l'spinner amb els diferents tipus de tipus de cursos a publicar
@@ -284,13 +288,16 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
                         @Override
                         public void onClick(DialogInterface dialogInterface, int which) {
                             product_id = adDTO.getAdId();
-                            String titol = ad_titol_edit.getText().toString().trim();
-                            String descripcio = ad_descripcio_edit.getText().toString().trim();
-                            String adType = ad_type_ad_edit.getSelectedItem().toString();
-                            String preu = ad_preu_edit.getText().toString().trim();
-                            //Llançament de l'asynktask per modificar les dades a la base de dades
-                            new getAdTypeByName().execute(adType, String.valueOf(product_id), titol, descripcio,
-                                    preu, String.valueOf(position));
+                            //Validem les dades introduides per l'usuari
+                            if(helper.validate_ad(ad_titol_edit, ad_descripcio_edit, ad_preu_edit, ad_type_ad_edit)){
+                                String titol = ad_titol_edit.getText().toString().trim();
+                                String descripcio = ad_descripcio_edit.getText().toString().trim();
+                                String adType = ad_type_ad_edit.getSelectedItem().toString();
+                                String preu = ad_preu_edit.getText().toString().trim();
+                                //Llançament de l'asynktask per modificar les dades a la base de dades
+                                new getAdTypeByName().execute(adType, String.valueOf(product_id), titol, descripcio,
+                                        preu, String.valueOf(position));
+                            }
                         }
                     });
                     //Tanquem el dialeg en cas de voler cancelar la operacio
@@ -613,7 +620,6 @@ public class ContactsAdapterProducts extends RecyclerView.Adapter<ContactsAdapte
         @Override
         protected void onPostExecute(Integer result){
             super.onPostExecute(result);
-
             //Llancem l'asynctask per realitzar la conexio en segon pla
             new editAd().execute(productId, titol, descripcio, String.valueOf(adTypeId), preu, position, categoria);
 
